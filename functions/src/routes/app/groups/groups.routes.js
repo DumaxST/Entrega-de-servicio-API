@@ -4,11 +4,11 @@ const router = Router();
 
 // Middlewares
 // const { validateToken } = require("../../middlewares/auth");
-const controller = require("./controller");
-// const userSchema = require("./userSchema");
+const controller = require("./groupsController");
+// const groupsSchema = require("./groupsSchema");
 
 // ---------------------------------------- RUTAS ---------------------------------------- 
 
-router.get("/get", controller.get);
+router.get("/groups", controller.get);
 
 module.exports = router;

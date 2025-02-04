@@ -92,13 +92,29 @@ const createApp = (routes) => {
   return app;
 };
 
-// Crear instancias para users y auth
-const App = createApp(require("./src/routes/route.routes"));
+// Rutas de la aplicación
+const appRoutes = [
+  require("./src/routes/app/companies/companies.routes"),
+  require("./src/routes/app/groups/groups.routes"),
+];
+
+// const serviceDeliveryRoutes = []
+// const torreDeControlRoutes = []
+
+// Crear instancias para app, serviceDelivery y torreDeControl
+const App = createApp(appRoutes);
+// const ServiceDelivery = createApp(serviceDeliveryRoutes);
+// const TorreDeControl = createApp(torreDeControlRoutes);
 
 // Exportar para Firebase Functions
 exports.app = functions.https.onRequest(App);
+// exports.serviceDelivery = functions.https.onRequest(ServiceDelivery);
+// exports.torreDeControl = functions.https.onRequest(TorreDeControl);
 
 // Exportar para Supertest
 if (process.env.NODE_ENV === "test") {
-  module.exports = { usersApp, authApp };
+  module.exports = {
+    App,
+    // , ServiceDelivery, TorreDeControl
+  };
 }
