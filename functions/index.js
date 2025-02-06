@@ -96,6 +96,7 @@ const createApp = (routes) => {
 const appRoutes = [
   require("./src/routes/app/companies/companies.routes"),
   require("./src/routes/app/groups/groups.routes"),
+  require("./src/routes/app/units/units.routes"),
 ];
 
 // const serviceDeliveryRoutes = []

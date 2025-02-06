@@ -1,11 +1,14 @@
 const admin = require("firebase-admin");
 const db = admin.firestore();
 const { FieldValue } = require("firebase-admin/firestore");
-require('dotenv').config();
-const secretKeyJWT = process.env.JWT_SECRET 
-const secretKeyRefresh = process.env.JWT_REFRESH_SECRET 
-const modo = process.env.MODO 
+require("dotenv").config();
+const secretKeyJWT = process.env.JWT_SECRET;
+const secretKeyRefresh = process.env.JWT_REFRESH_SECRET;
+const accessToken = process.env.WIALON_ACCESS_TOKEN;
+const wialonURL = process.env.WIALON_URL;
+const modo = process.env.MODO;
 const jwt = require("jsonwebtoken");
+const axios = require("axios");
 
 module.exports = {
   getDocument: async (ref, id) => {
@@ -158,6 +161,7 @@ module.exports = {
     }
   },
 
+  //--------------------------------------------------Funciones de paginado--------------------------------------------------
   // Numero total de elementos de una coleccion sin filtros (Se utiliza para saber el numero total de paginas)
   getTotalDocuments: async (collectionPath) => {
     try {
@@ -309,40 +313,7 @@ module.exports = {
     }
   },
 
-  //Ejemplo de paginado aplicado en OASIS
-
-  //   // Define los filtros y exclusiones
-  //   const itemsPerPageNumber = parseInt(itemsPerPage, 10); (Se define la cantidad de elementos por pagina)
-  //   const filters = [["propertyID", "==", propertyID]]; (Se define un filtro)
-  //   const excludeFilters = ["type", ["user", "collaborator", "admin", "guard", "vehicle"]]; (Se define un filtro de exclusion, osea que no se mostraran los elementos que tengan estos "types")
-  //   const orderBy = ["inviteDetails.name", "asc"]; (Se define el orden de los elementos)
-
-  //   // Obtén el total de documentos filtrados para calcular el total de páginas (si es necesario)
-  //   const totalDocuments = await getTotalDocumentsWithFilters(
-  //     `residentials/${residentialID}/access`,
-  //     filters,
-  //     excludeFilters
-  //   );
-  //   const totalPages = Math.ceil(totalDocuments / itemsPerPageNumber);
-
-  //   // Suponiendo que tienes variables `itemsPerPage` y `lastDocId` para la paginación
-  //   const { documents, newLastDocId } = await getPaginatedFilteredDocuments(
-  //     `residentials/${residentialID}/access`,
-  //     filters,
-  //     excludeFilters,
-  //     orderBy,
-  //     itemsPerPageNumber, // Asegúrate de que esta variable esté definida y sea un número
-  //     lastDocId // Asegúrate de que esta variable esté definida o sea null si es la primera página
-  //   );
-
-  //   // Construye la respuesta con los documentos filtrados y paginados
-  //   return res.status(200).json({
-  //     page: documents,
-  //     totalPages: totalPages,
-  //     lastDocId: newLastDocId,
-  //   });
-  // }
-
+  //--------------------------------------------------Autenticación--------------------------------------------------
   generateToken: async (data) => {
     const expiresIn = 60 * 20; // 20 minutos
     const token = jwt.sign(data, secretKeyJWT, { expiresIn });
@@ -363,7 +334,7 @@ module.exports = {
         httpOnly: true,
         secure: modo === "production" || modo === "development" ? true : false,
         sameSite: "None",
-        maxAge: expiresIn * 1000,
+        maxAge: expiresIn * 1000, // 30 días
       });
 
       return { refreshToken, expirationDate };
@@ -387,5 +358,65 @@ module.exports = {
     res.clearCookie("refreshToken");
     await db.collection(ref).doc(id).delete();
     return true;
+  },
+
+  //--------------------------------------------------Reporte Wialon--------------------------------------------------
+  getSidFromToken: async () => {
+    const params = {
+      svc: "token/login",
+      params: JSON.stringify({ token: accessToken }),
+    };
+    const response = await axios.get(wialonURL, { params });
+    return response.data.eid;
+  },
+  fetchAllUnitsWialon: async (sid) => {
+    const params = {
+      svc: "core/search_items",
+      params: JSON.stringify({
+        spec: {
+          itemsType: "avl_unit",
+          propName: "sys_name,rel_last_msg_date",
+          propValueMask: "*",
+          sortType: "sys_name",
+          propType: "property,property",
+          or_logic: 0,
+        },
+        force: 1,
+        flags: 1025, // Incluye datos de posición y último mensaje
+        from: 0,
+        to: 10,
+      }),
+      sid: sid,
+    };
+    const response = await axios.get(wialonURL, { params });
+    return response.data.items;
+  },
+  isUnitReportingWialon: (unitData, allowedInterval = 3600) => { // 1 hora
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    const lastMsgTime = unitData?.lmsg?.t || 0; // Tiempo del último mensaje
+    const posTime = unitData?.pos?.t || 0; // Tiempo de la última posición
+    const lat = unitData?.pos?.y || 0; // Latitud
+    const lon = unitData?.pos?.x || 0; // Longitud
+    const gsmSignal = unitData?.lmsg?.p?.gsm_signal || null; // Señal GSM
+    const fValue = unitData?.pos?.f || 0; // Flag de la posición
+    const batteryLevel = unitData?.lmsg?.p?.battery_level || null; // Nivel de batería
+
+    // Validaciones adicionales
+    const hasValidCoordinates = !(lat === 0 && lon === 0); // Coordenadas no deben ser 0
+    const isRecent = currentTime - lastMsgTime <= allowedInterval;
+    const isTimeAligned = Math.abs(lastMsgTime - posTime) <= 3600; // Diferencia de tiempo entre pos y lmsg
+    const hasValidSignal = gsmSignal === null || gsmSignal > 0; // GSM puede ser null y aún reportar.
+    const isFlagValid = fValue > 0;
+    const hasValidBattery = batteryLevel === null || batteryLevel > 10; // Batería válida si es null o mayor a 10%.
+
+    // Considerar reportando si cumple los criterios relajados
+    return (
+      hasValidCoordinates &&
+      isRecent &&
+      isTimeAligned &&
+      hasValidBattery &&
+      (hasValidSignal || isFlagValid)
+    );
   },
 };
