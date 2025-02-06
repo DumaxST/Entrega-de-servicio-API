@@ -1,5 +1,6 @@
 {
-    "hello": "Hola",
     "companies": "Empresas",
-    "groups": "Grupos"
+    "groups": "Grupos",
+    "SIDNotFound": "SID no encontrado o Access Token inválido",
+    "UnitsNotFound": "Unidades no encontradas"
 }
