@@ -1,5 +1,6 @@
 {
-    "hello": "Hello",
     "companies": "Companies",
-    "groups": "Groups"
+    "groups": "Groups",
+    "SIDNotFound": "SID not found or invalid Access Token",
+    "UnitsNotFound": "Units not found"
 }
