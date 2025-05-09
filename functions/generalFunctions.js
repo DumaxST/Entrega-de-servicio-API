@@ -384,7 +384,7 @@ module.exports = {
         force: 1,
         flags: 1025, // Incluye datos de posición y último mensaje
         from: 0,
-        to: 10,
+        to: 9999999999,
       }),
       sid: sid,
     };
