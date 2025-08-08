@@ -97,6 +97,7 @@ const appRoutes = [
   require("./src/routes/app/companies/companies.routes"),
   require("./src/routes/app/groups/groups.routes"),
   require("./src/routes/app/units/units.routes"),
+  require("./src/routes/app/units/pdfUnits.routes"),
 ];
 
 // const serviceDeliveryRoutes = []
