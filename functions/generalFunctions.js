@@ -1,6 +1,8 @@
 const admin = require("firebase-admin");
 const db = admin.firestore();
 const { FieldValue } = require("firebase-admin/firestore");
+const { checkSchema, validationResult } = require("express-validator");
+
 require("dotenv").config();
 const secretKeyJWT = process.env.JWT_SECRET;
 const secretKeyRefresh = process.env.JWT_REFRESH_SECRET;
@@ -159,6 +161,31 @@ module.exports = {
       console.error("Error sending Firebase email:", error);
       throw new Error("Error sending Firebase email");
     }
+  },
+   validationErrorsExpress: (req, res) => {
+    const validation = validationResult(req);
+    let err = false;
+    if (!validation.isEmpty()) {
+      const error = validation.errors[0];
+      let status = 422;
+
+      if (errorMessages.includes(error.msg)) {
+        status = 404;
+      }
+
+      err = true;
+
+      return res.status(status).json({
+        errors: validation.errors.map((el) => ({
+          ...el,
+          msg:
+            status !== 404
+              ? module.exports.expressDictionary(req.query.lang, el.msg)
+              : module.exports.generalDictionary(req.query.lang, el.msg),
+        })),
+      });
+    }
+    return err;
   },
 
   //--------------------------------------------------Funciones de paginado--------------------------------------------------
