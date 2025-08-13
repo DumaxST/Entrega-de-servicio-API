@@ -2,5 +2,14 @@
     "companies": "Companies",
     "groups": "Groups",
     "SIDNotFound": "SID not found or invalid Access Token",
-    "UnitsNotFound": "Units not found"
+    "UnitsNotFound": "Units not found",
+    "EmailAndPasswordRequired": "Email and password are required",
+    "UserNotFound": "User not found",
+    "InvalidCredentials": "Invalid email or password",
+    "UserDisabled": "User account has been disabled",
+    "InternalServerError": "Internal server error",
+    "TokenNotFound": "Token not found",
+    "InvalidOrExpiredToken": "Invalid or expired token",
+    "RefreshTokenNotFound": "Refresh token not found",
+    "InvalidTokenOrPwdEmail": "Invalid token or email/password combination"
 }
