@@ -2,5 +2,14 @@
     "companies": "Empresas",
     "groups": "Grupos",
     "SIDNotFound": "SID no encontrado o Access Token inválido",
-    "UnitsNotFound": "Unidades no encontradas"
+    "UnitsNotFound": "Unidades no encontradas",
+    "EmailAndPasswordRequired": "Email y contraseña son requeridos",
+    "UserNotFound": "Usuario no encontrado",
+    "InvalidCredentials": "Email o contraseña inválidos",
+    "UserDisabled": "La cuenta del usuario ha sido deshabilitada",
+    "InternalServerError": "Error interno del servidor",
+    "TokenNotFound": "Token no encontrado",
+    "InvalidOrExpiredToken": "Token inválido o expirado",
+    "RefreshTokenNotFound": "Token de actualización no encontrado",
+    "InvalidTokenOrPwdEmail": "Token inválido o combinación de email/contraseña incorrecta"
 }
