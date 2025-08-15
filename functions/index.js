@@ -98,7 +98,7 @@ const appRoutes = [
   require("./src/routes/app/groups/groups.routes"),
   require("./src/routes/app/units/units.routes"),
   require("./src/routes/app/users/users.routes"),
-  require("./src/routes/general/auth/authUser.routes")
+  require("./src/routes/general/auth/authUser.routes"),
   require("./src/routes/app/units/pdfUnits.routes"),
 ];
 
