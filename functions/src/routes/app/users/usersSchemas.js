@@ -155,6 +155,23 @@ const schemas = {
       .isString()
       .withMessage("MustBeAString"),
   ],
+  password: [
+    check("password", "SintaxError").custom((value, { req }) => {
+      //Para POST
+      if (["POST"].includes(req.method) && !value) {
+        throw new Error("MustNotBeEmpty");
+      }
+      //Para POST y PUT
+      if (value && typeof value !== "string") {
+        throw new Error("MustBeAString");
+      }
+      //Validar longitud mínima de contraseña
+      if (value && value.length < 6) {
+        throw new Error("PasswordTooShort");
+      }
+      return true;
+    }),
+  ],
   profilePicture: [
     check("profilePicture", "SintaxError")
       .optional()
@@ -214,12 +231,35 @@ const schemas = {
 
 module.exports = {
   post:[].concat(
-   
+    schemas.firstName,
+    schemas.lastName,
+    schemas.email,
+    schemas.password,
+    schemas.phone,
+    schemas.role,
+    schemas.profilePicture
+  ),
+  put: [
+    check("id", "SintaxError")
+      .notEmpty()
+      .withMessage("MustNotBeEmpty")
+      .bail()
+      .isString()
+      .withMessage("MustBeAString")
+  ].concat(
     schemas.firstName,
     schemas.lastName,
     schemas.email,
     schemas.phone,
     schemas.role,
     schemas.profilePicture
-  )
+  ),
+  delete: [
+    check("id", "SintaxError")
+      .notEmpty()
+      .withMessage("MustNotBeEmpty")
+      .bail()
+      .isString()
+      .withMessage("MustBeAString")
+  ]
 }
