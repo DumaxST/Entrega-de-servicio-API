@@ -1,5 +1,5 @@
-const { check, validationResult } = require("express-validator");
-const { getDocument, getDocuments } = require("../../../../ccFunctions");
+const {check, validationResult} = require("express-validator");
+const {getDocument, getDocuments} = require("../../../../ccFunctions");
 
 const {
   checkIfEmailIsRegistered,
@@ -10,12 +10,12 @@ const {
 
 const schemas = {
   auth: [
-    check("auth", "SintaxError").custom((value, { req }) => {
-      //Para POST
+    check("auth", "SintaxError").custom((value, {req}) => {
+      // Para POST
       if (["POST"].includes(req.method) && !value) {
         throw new Error("MustNotBeEmpty");
       }
-      //Para POST y PUT
+      // Para POST y PUT
       if (value && typeof value !== "string") {
         throw new Error("MustBeAString");
       }
@@ -33,13 +33,13 @@ const schemas = {
       )
       .withMessage("MustBeAnObject"),
   ],
-    firstName: [
-    check("firstName", "SintaxError").custom((value, { req }) => {
-      //Para POST
+  firstName: [
+    check("firstName", "SintaxError").custom((value, {req}) => {
+      // Para POST
       if (["POST"].includes(req.method) && !value) {
         throw new Error("MustNotBeEmpty");
       }
-      //Para POST y PUT
+      // Para POST y PUT
       if (value && typeof value !== "string") {
         throw new Error("MustBeAString");
       }
@@ -47,12 +47,12 @@ const schemas = {
     }),
   ],
   lastName: [
-    check("lastName", "SintaxError").custom((value, { req }) => {
-      //Para POST
+    check("lastName", "SintaxError").custom((value, {req}) => {
+      // Para POST
       if (["POST"].includes(req.method) && !value) {
         throw new Error("MustNotBeEmpty");
       }
-      //Para POST y PUT
+      // Para POST y PUT
       if (value && typeof value !== "string") {
         throw new Error("MustBeAString");
       }
@@ -61,12 +61,12 @@ const schemas = {
   ],
   email: [
     check("email", "SintaxError")
-      .custom((value, { req }) => {
-        //Para POST
-        if (["POST"].includes(req.method) && !value) {
+      .custom((value, {req}) => {
+        // Para POST
+        if (["POST"].includes(req.method) && (value === undefined || value === null || value === "")) {
           throw new Error("MustNotBeEmpty");
         }
-        //Para POST y PUT
+        // Para POST y PUT
         if (value && typeof value !== "string") {
           throw new Error("MustBeAString");
         }
@@ -77,7 +77,7 @@ const schemas = {
         return true;
       })
       .bail()
-      .custom(async (value, { req }) => {
+      .custom(async (value, {req}) => {
         if (value) {
           const existingUser = await getUserByEmail(value);
           // Si es una solicitud PUT y el único usuario existente es el que se está editando, no lanzar un error
@@ -122,16 +122,17 @@ const schemas = {
     },
   ],
   phone: [
-    check("phone", "SintaxError").custom(async (value, { req }) => {
-      //Para POST y PUT
+    check("phone", "SintaxError").custom(async (value, {req}) => {
+      // Para POST y PUT
       if (value && typeof value !== "string") {
         throw new Error("MustBeAString");
       }
       if (value) {
-        const existingUser = await getDocuments(
-          `users`,
-          ["phone", "==", value]
-        );
+        const existingUser = await getDocuments(`users`, [
+          "phone",
+          "==",
+          value,
+        ]);
         // Si es una solicitud PUT y el único usuario existente es el que se está editando, no lanzar un error
         if (
           req.method === "PUT" &&
@@ -156,16 +157,16 @@ const schemas = {
       .withMessage("MustBeAString"),
   ],
   password: [
-    check("password", "SintaxError").custom((value, { req }) => {
-      //Para POST
+    check("password", "SintaxError").custom((value, {req}) => {
+      // Para POST
       if (["POST"].includes(req.method) && !value) {
         throw new Error("MustNotBeEmpty");
       }
-      //Para POST y PUT
+      // Para POST y PUT
       if (value && typeof value !== "string") {
         throw new Error("MustBeAString");
       }
-      //Validar longitud mínima de contraseña
+      // Validar longitud mínima de contraseña
       if (value && value.length < 6) {
         throw new Error("PasswordTooShort");
       }
@@ -175,13 +176,13 @@ const schemas = {
   profilePicture: [
     check("profilePicture", "SintaxError")
       .optional()
-      .custom((value, { req }) => {
+      .custom((value, {req}) => {
         const language = req?.query?.lang;
         if (typeof value !== "object") {
           throw new Error("MustBeAnObject");
         }
 
-        const { url, fileName, ...rest } = value;
+        const {url, fileName, ...rest} = value;
 
         if (Object.keys(rest).length > 0) {
           throw new Error(
@@ -230,7 +231,7 @@ const schemas = {
 };
 
 module.exports = {
-  post:[].concat(
+  post: [].concat(
     schemas.firstName,
     schemas.lastName,
     schemas.email,
@@ -245,7 +246,7 @@ module.exports = {
       .withMessage("MustNotBeEmpty")
       .bail()
       .isString()
-      .withMessage("MustBeAString")
+      .withMessage("MustBeAString"),
   ].concat(
     schemas.firstName,
     schemas.lastName,
@@ -260,6 +261,6 @@ module.exports = {
       .withMessage("MustNotBeEmpty")
       .bail()
       .isString()
-      .withMessage("MustBeAString")
-  ]
-}
+      .withMessage("MustBeAString"),
+  ],
+};

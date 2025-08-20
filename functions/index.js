@@ -1,3 +1,12 @@
+/**
+ * Import function triggers from their respective submodules:
+ *
+ * const {onCall} = require("firebase-functions/v2/https");
+ * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
+ *
+ * See a full list of supported triggers at https://firebase.google.com/docs/functions
+ */
+
 // Dependencias Firebase
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
@@ -14,7 +23,7 @@ const cors = require("cors");
 
 // Middlewares
 const ErrorHandler = require("./src/middlewares/errorHandler");
-const { languageTranslation } = require("./src/middlewares");
+const {languageTranslation} = require("./src/middlewares");
 
 // Configuración de serviceAccount
 const serviceAccount = require("./serviceAccount.json");
@@ -26,7 +35,7 @@ admin.initializeApp({
   storageBucket: "gs://service-delivery-development.firebasestorage.app",
 });
 
-//Bucket de almacenemaiento
+// Bucket de almacenemaiento
 const bucket = admin
   .storage()
   .bucket("gs://service-delivery-development.firebasestorage.app");
@@ -38,7 +47,7 @@ i18next
   .use(middleware.LanguageDetector)
   .init({
     fallbackLng: "en",
-    backend: { loadPath: "./dictionary/{{lng}}.json" },
+    backend: {loadPath: "./dictionary/{{lng}}.json"},
   });
 
 // Orígenes permitidos
@@ -59,6 +68,10 @@ const createApp = (routes) => {
         }
       },
       credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With", "role"],
+      preflightContinue: false,
+      optionsSuccessStatus: 200
     })
   );
 

@@ -1,8 +1,8 @@
 const admin = require("firebase-admin");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
-const { getDocument } = require("../../generalFunctions");
-const { ClientError } = require("./errors/index");
+const {getDocument} = require("../../generalFunctions");
+const {ClientError} = require("./errors/index");
 require("dotenv").config();
 const secretKeyJWT = process.env.JWT_SECRET;
 const secretKeyRefresh = process.env.JWT_REFRESH_SECRET;
@@ -51,7 +51,7 @@ const validateRefreshToken = (req, res, next) => {
 
 const validateAuthTokenFirebase = async (req, res, next) => {
   try {
-    //para simular front descomentar para pruebas y comentar también schema en ruta
+    // para simular front descomentar para pruebas y comentar también schema en ruta
     // const auth = await axios.post(
     //   `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${key}`,
     //   {

@@ -1,6 +1,6 @@
-const { default: axios } = require("axios");
+const {default: axios} = require("axios");
 const admin = require("firebase-admin");
-const { FieldValue } = require("firebase-admin/firestore");
+const {FieldValue} = require("firebase-admin/firestore");
 const db = admin.firestore();
 const bucket = require("./index").bucket;
 const urlOptions = {
@@ -8,15 +8,11 @@ const urlOptions = {
   action: "read",
   expires: Date.now() + 1000 * 60 * (60 * 5), // 15 minutes
 };
-const fs = require("fs");
-const { get } = require("http");
-const { localHostAPI } = require("./configVars");
-const { log } = require("firebase-functions/logger");
 
 module.exports = {
   getDocument: async (ref, id) => {
     const query = db.collection(ref).doc(id);
-    let item = await query.get();
+    const item = await query.get();
     if (item.exists) {
       const itemToReturn = item.data();
       itemToReturn.id = id;
@@ -40,12 +36,12 @@ module.exports = {
 
     const items = await query.get();
     const list = items.docs;
-    let array = list.reduce(
-      (acc, el) => acc.concat({ ...el.data(), id: el.id }),
+    const array = list.reduce(
+      (acc, el) => acc.concat({...el.data(), id: el.id}),
       []
     );
 
-    for (let element of array) {
+    for (const element of array) {
       const collections = await module.exports.getDocumentCollections(
         ref,
         element.id
@@ -57,7 +53,7 @@ module.exports = {
   },
   getDocumentCollections: async (ref, id) => {
     const query = db.collection(ref).doc(id);
-    let collections = await query.listCollections();
+    const collections = await query.listCollections();
     return collections.map((collection) => collection.id);
   },
   getBucketItem: async (itemRef) => {
@@ -65,7 +61,7 @@ module.exports = {
   },
   createDocument: async (ref, obj, id) => {
     if (obj.test) {
-      return { ...obj, id: "TESTID-XKAhEeCFDm" };
+      return {...obj, id: "TESTID-XKAhEeCFDm"};
     }
 
     if (id == undefined) {
@@ -90,27 +86,27 @@ module.exports = {
     delete document.id;
     await module.exports.createDocument(
       to,
-      { ...document, createdAt: FieldValue.serverTimestamp() },
+      {...document, createdAt: FieldValue.serverTimestamp()},
       from.id
     );
     return true;
   },
   updateDocument: async (ref, id, obj) => {
     if (obj.test) {
-      return { ...obj, id: "TESTID-XKAhEeCFDm" };
+      return {...obj, id: "TESTID-XKAhEeCFDm"};
     }
 
     return await db
       .collection(ref)
       .doc(id)
-      .update({ ...obj, updatedAt: FieldValue.serverTimestamp() })
+      .update({...obj, updatedAt: FieldValue.serverTimestamp()})
       .then(async () => {
         return await module.exports.getDocument(ref, id);
       });
   },
   deleteDocument: async (ref, id, test) => {
     if (test) {
-      //Regresar si return true es correcto
+      // Regresar si return true es correcto
       return true;
     }
 
@@ -138,7 +134,7 @@ module.exports = {
     };
   },
   deleteDirectory: async (directoryRef) => {
-    return await bucket.deleteFiles({ prefix: directoryRef });
+    return await bucket.deleteFiles({prefix: directoryRef});
   },
   confirmDocOwner: async (ref, docID, ownerID) => {
     const doc = await module.exports.getDocument(ref, docID);
@@ -187,7 +183,7 @@ module.exports = {
     correctDataType, // ["string", "number", "boolean", "object", "array", "undefined", "null"]
     atributeRoute // "user.name"
   ) => {
-    let dataTypes = [
+    const dataTypes = [
       "string",
       "number",
       "boolean",
@@ -223,7 +219,7 @@ module.exports = {
       }
     }
 
-    for (let dataType of dataTypes.filter(
+    for (const dataType of dataTypes.filter(
       (el) => !correctDataType.includes(el)
     )) {
       try {
@@ -448,11 +444,11 @@ module.exports = {
 
     snapshot.forEach((doc) => {
       const docData = doc.data();
-      documents.push({ ...docData, id: doc.id }); // Agregando la propiedad "id"
+      documents.push({...docData, id: doc.id}); // Agregando la propiedad "id"
       newLastDocId = doc.id;
     });
 
-    return { documents, newLastDocId };
+    return {documents, newLastDocId};
   },
 
   // Paginado de colecciones con filtros
@@ -499,10 +495,10 @@ module.exports = {
 
     snapshot.forEach((doc) => {
       const docData = doc.data();
-      documents.push({ ...docData, id: doc.id }); // Agregando la propiedad "id"
+      documents.push({...docData, id: doc.id}); // Agregando la propiedad "id"
       newLastDocId = doc.id;
     });
 
-    return { documents, newLastDocId };
+    return {documents, newLastDocId};
   },
 };

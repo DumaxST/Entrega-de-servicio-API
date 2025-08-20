@@ -1,4 +1,4 @@
-const { response, cachedAsync } = require("../../../middlewares");
+const {response, cachedAsync} = require("../../../middlewares");
 
 const get = async (req, res) => {
   const data = req.t("groups");

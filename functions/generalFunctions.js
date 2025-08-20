@@ -1,7 +1,7 @@
 const admin = require("firebase-admin");
 const db = admin.firestore();
-const { FieldValue } = require("firebase-admin/firestore");
-const { checkSchema, validationResult } = require("express-validator");
+const {FieldValue} = require("firebase-admin/firestore");
+const {checkSchema, validationResult} = require("express-validator");
 
 require("dotenv").config();
 const secretKeyJWT = process.env.JWT_SECRET;
@@ -49,14 +49,14 @@ module.exports = {
 
       const items = await query.get();
       const list = items.docs;
-      const array = list.map((el) => ({ ...el.data(), id: el.id }));
+      const array = list.map((el) => ({...el.data(), id: el.id}));
 
       const promises = array.map(async (element) => {
         const collections = await module.exports.getDocumentCollections(
           ref,
           element.id
         );
-        return { ...element, collections };
+        return {...element, collections};
       });
 
       const results = await Promise.all(promises);
@@ -95,7 +95,7 @@ module.exports = {
   createDocument: async (ref, obj, id) => {
     try {
       if (obj.test) {
-        return { ...obj, id: "TESTID-XKAhEeCFDm" };
+        return {...obj, id: "TESTID-XKAhEeCFDm"};
       }
 
       const data = {
@@ -106,10 +106,10 @@ module.exports = {
 
       if (id === undefined) {
         const docRef = await db.collection(ref).add(data);
-        return { ...data, id: docRef.id };
+        return {...data, id: docRef.id};
       } else {
         await db.collection(ref).doc(id).set(data);
-        return { ...data, id };
+        return {...data, id};
       }
     } catch (error) {
       console.error("Error creating document:", error);
@@ -119,7 +119,7 @@ module.exports = {
   updateDocument: async (ref, id, obj) => {
     try {
       if (obj.test) {
-        return { ...obj, id: "TESTID-XKAhEeCFDm" };
+        return {...obj, id: "TESTID-XKAhEeCFDm"};
       }
 
       await db
@@ -162,16 +162,16 @@ module.exports = {
       throw new Error("Error sending Firebase email");
     }
   },
-   validationErrorsExpress: (req, res) => {
+  validationErrorsExpress: (req, res) => {
     const validation = validationResult(req);
     let err = false;
     if (!validation.isEmpty()) {
       const error = validation.errors[0];
-      let status = 422;
+      const status = 422;
 
-      if (errorMessages.includes(error.msg)) {
-        status = 404;
-      }
+      // if (errorMessages.includes(error.msg)) {
+      //   status = 404;
+      // }
 
       err = true;
 
@@ -188,7 +188,7 @@ module.exports = {
     return err;
   },
 
-  //--------------------------------------------------Funciones de paginado--------------------------------------------------
+  // --------------------------------------------------Funciones de paginado--------------------------------------------------
   // Numero total de elementos de una coleccion sin filtros (Se utiliza para saber el numero total de paginas)
   getTotalDocuments: async (collectionPath) => {
     try {
@@ -262,11 +262,11 @@ module.exports = {
 
       snapshot.forEach((doc) => {
         const docData = doc.data();
-        documents.push({ ...docData, id: doc.id }); // Agregando la propiedad "id"
+        documents.push({...docData, id: doc.id}); // Agregando la propiedad "id"
         newLastDocId = doc.id;
       });
 
-      return { documents, newLastDocId };
+      return {documents, newLastDocId};
     } catch (error) {
       console.error(
         `Error getting paginated documents for ${collectionPath}:`,
@@ -326,11 +326,11 @@ module.exports = {
 
       snapshot.forEach((doc) => {
         const docData = doc.data();
-        documents.push({ ...docData, id: doc.id }); // Agregando la propiedad "id"
+        documents.push({...docData, id: doc.id}); // Agregando la propiedad "id"
         newLastDocId = doc.id;
       });
 
-      return { documents, newLastDocId };
+      return {documents, newLastDocId};
     } catch (error) {
       console.error(
         `Error getting paginated filtered documents for ${collectionPath}:`,
@@ -340,19 +340,19 @@ module.exports = {
     }
   },
 
-  //--------------------------------------------------Autenticación--------------------------------------------------
+  // --------------------------------------------------Autenticación--------------------------------------------------
   generateToken: async (data) => {
     const expiresIn = 60 * 20; // 20 minutos
-    const token = jwt.sign(data, secretKeyJWT, { expiresIn });
+    const token = jwt.sign(data, secretKeyJWT, {expiresIn});
     const expirationDate = new Date(Date.now() + expiresIn * 1000);
-    return { expirationDate, token };
+    return {expirationDate, token};
   },
   generateRefreshToken: async (data, res, ref, indefiniteTime = false) => {
     if (!indefiniteTime) {
       const expiresIn = 60 * 60 * 24 * 30; // 30 días
-      const refreshToken = jwt.sign(data, secretKeyRefresh, { expiresIn });
+      const refreshToken = jwt.sign(data, secretKeyRefresh, {expiresIn});
       const expirationDate = new Date(Date.now() + expiresIn * 1000);
-      const dataWithExpiration = { ...data, expirationDate, refreshToken };
+      const dataWithExpiration = {...data, expirationDate, refreshToken};
       delete dataWithExpiration.id;
       delete dataWithExpiration.role;
       await db.collection(ref).add(dataWithExpiration);
@@ -364,11 +364,11 @@ module.exports = {
         maxAge: expiresIn * 1000, // 30 días
       });
 
-      return { refreshToken, expirationDate };
+      return {refreshToken, expirationDate};
     }
 
     const refreshToken = jwt.sign(data, secretKeyRefresh);
-    const dataNormal = { ...data, refreshToken, expirationDate: "indefinite" };
+    const dataNormal = {...data, refreshToken, expirationDate: "indefinite"};
     delete dataNormal.id;
     delete dataNormal.role;
     await db.collection(ref).add(dataNormal);
@@ -379,7 +379,7 @@ module.exports = {
       sameSite: "None",
     });
 
-    return { refreshToken, expirationDate: "indefinite" };
+    return {refreshToken, expirationDate: "indefinite"};
   },
   destroyToken: async (ref, id, res) => {
     res.clearCookie("refreshToken");
@@ -387,13 +387,13 @@ module.exports = {
     return true;
   },
 
-  //--------------------------------------------------Reporte Wialon--------------------------------------------------
+  // --------------------------------------------------Reporte Wialon--------------------------------------------------
   getSidFromToken: async () => {
     const params = {
       svc: "token/login",
-      params: JSON.stringify({ token: accessToken }),
+      params: JSON.stringify({token: accessToken}),
     };
-    const response = await axios.get(wialonURL, { params });
+    const response = await axios.get(wialonURL, {params});
     return response.data.eid;
   },
   fetchAllUnitsWialon: async (sid) => {
@@ -415,10 +415,11 @@ module.exports = {
       }),
       sid: sid,
     };
-    const response = await axios.get(wialonURL, { params });
+    const response = await axios.get(wialonURL, {params});
     return response.data.items;
   },
-  isUnitReportingWialon: (unitData, allowedInterval = 3600) => { // 1 hora
+  isUnitReportingWialon: (unitData, allowedInterval = 3600) => {
+    // 1 hora
     const currentTime = Math.floor(Date.now() / 1000);
 
     const lastMsgTime = unitData?.lmsg?.t || 0; // Tiempo del último mensaje
@@ -445,5 +446,28 @@ module.exports = {
       hasValidBattery &&
       (hasValidSignal || isFlagValid)
     );
+  },
+
+  // --------------------------------------------------Dictionary Functions--------------------------------------------------
+  generalDictionary: (lang, key) => {
+    try {
+      const language = lang === "es" ? "es" : "en";
+      const dictionary = require(`./dictionary/${language}.json`);
+      return dictionary[key] || key;
+    } catch (error) {
+      console.error(`Error loading dictionary for language ${lang}:`, error);
+      return key;
+    }
+  },
+
+  expressDictionary: (lang, key) => {
+    try {
+      const language = lang === "es" ? "es" : "en";
+      const dictionary = require(`./dictionary/${language}.json`);
+      return dictionary[key] || key;
+    } catch (error) {
+      console.error(`Error loading dictionary for language ${lang}:`, error);
+      return key;
+    }
   },
 };

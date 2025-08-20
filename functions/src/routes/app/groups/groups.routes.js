@@ -1,5 +1,5 @@
 // Express
-const { Router } = require("express");
+const {Router} = require("express");
 const router = Router();
 
 // Middlewares
@@ -7,7 +7,7 @@ const router = Router();
 const controller = require("./groupsController");
 // const groupsSchema = require("./groupsSchema");
 
-// ---------------------------------------- RUTAS ---------------------------------------- 
+// ---------------------------------------- RUTAS ----------------------------------------
 
 router.get("/groups", controller.get);
 

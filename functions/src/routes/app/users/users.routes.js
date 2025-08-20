@@ -1,36 +1,32 @@
-const { Router } = require("express");
+const {Router} = require("express");
 const router = Router();
 
-//const bucket = require("../../../index").bucket;
-//const variables = require("../../../envConfig.js");
+// const bucket = require("../../../index").bucket;
+// const variables = require("../../../envConfig.js");
 
-//const { FieldValue } = require("firebase-admin/firestore");
-const { checkSchema, validationResult } = require("express-validator");
+// const { FieldValue } = require("firebase-admin/firestore");
+const {checkSchema, validationResult} = require("express-validator");
 const userSchema = require("./usersSchemas.js");
 
 const {
   getDocument,
   createDocument,
-  getDocuments,
   updateDocument,
   deleteDocument,
-  sendFirebaseEmail,
 } = require("../../../../ccFunctions.js");
 
 const {
   generalDictionary,
-  expressDictionary,
   validationErrorsExpress,
-  deleteAdmins,
-  userPermissions,
 } = require("../../../../generalFunctions.js");
 const admin = require("firebase-admin");
 
 router.post("/user", userSchema.post, async (req, res) => {
-  if (validationErrorsExpress(req, res)) return;
+  // if (validationErrorsExpress(req, res)) return;
 
   const language = req?.query?.lang;
-  const { email, password, lastName, firstName, phone, role, profilePicture } = req?.body;
+  const {email, password, lastName, firstName, phone, role, profilePicture} =
+    req.body;
 
   try {
     const newUser = await admin.auth().createUser({
@@ -48,7 +44,7 @@ router.post("/user", userSchema.post, async (req, res) => {
       phone: phone || null,
       role: role,
       profilePicture: profilePicture || null,
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: new Date(),
     };
 
     const userDoc = await createDocument("users", userData);
@@ -66,17 +62,17 @@ router.post("/user", userSchema.post, async (req, res) => {
     });
   } catch (error) {
     console.error("Error creating user:", error);
-    
+
     if (error.code === "auth/email-already-exists") {
       return res.status(409).json({
         error: "EmailAlreadyExists",
-        message: generalDictionary(language, "EmailAlreadyExists")
+        message: generalDictionary(language, "EmailAlreadyExists"),
       });
     }
-    
+
     return res.status(500).json({
       error: "InternalServerError",
-      message: generalDictionary(language, "InternalServerError")
+      message: generalDictionary(language, "InternalServerError"),
     });
   }
 });
@@ -85,28 +81,31 @@ router.put("/user/:id", userSchema.put, async (req, res) => {
   if (validationErrorsExpress(req, res)) return;
 
   const language = req?.query?.lang;
-  const { id } = req.params;
-  const { firstName, lastName, email, phone, role, profilePicture } = req?.body;
+  const {id} = req.params;
+  const {firstName, lastName, email, phone, role, profilePicture} = req?.body;
 
   try {
     const userDoc = await getDocument("users", id);
-    
+
     if (!userDoc.exists) {
       return res.status(404).json({
         error: "UserNotFound",
-        message: generalDictionary(language, "UserNotFound")
+        message: generalDictionary(language, "UserNotFound"),
       });
     }
 
     const currentUserData = userDoc.data();
-    
+
     const updateData = {
       firstName: firstName || currentUserData.firstName,
       lastName: lastName || currentUserData.lastName,
       email: email || currentUserData.email,
       phone: phone !== undefined ? phone : currentUserData.phone,
       role: role || currentUserData.role,
-      profilePicture: profilePicture !== undefined ? profilePicture : currentUserData.profilePicture,
+      profilePicture:
+        profilePicture !== undefined
+          ? profilePicture
+          : currentUserData.profilePicture,
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     };
 
@@ -123,7 +122,7 @@ router.put("/user/:id", userSchema.put, async (req, res) => {
         if (firstName || lastName) {
           authUpdateData.displayName = updateData.displayName;
         }
-        
+
         if (Object.keys(authUpdateData).length > 0) {
           await admin.auth().updateUser(currentUserData.uid, authUpdateData);
         }
@@ -132,7 +131,7 @@ router.put("/user/:id", userSchema.put, async (req, res) => {
         if (authError.code === "auth/email-already-exists") {
           return res.status(409).json({
             error: "EmailAlreadyExists",
-            message: generalDictionary(language, "EmailAlreadyExists")
+            message: generalDictionary(language, "EmailAlreadyExists"),
           });
         }
         throw authError;
@@ -156,13 +155,12 @@ router.put("/user/:id", userSchema.put, async (req, res) => {
       profilePicture: updatedUserData.profilePicture,
       updatedAt: updatedUserData.updatedAt,
     });
-
   } catch (error) {
     console.error("Error updating user:", error);
-    
+
     return res.status(500).json({
       error: "InternalServerError",
-      message: generalDictionary(language, "InternalServerError")
+      message: generalDictionary(language, "InternalServerError"),
     });
   }
 });
@@ -171,20 +169,20 @@ router.delete("/user/:id", userSchema.delete, async (req, res) => {
   if (validationErrorsExpress(req, res)) return;
 
   const language = req?.query?.lang;
-  const { id } = req.params;
+  const {id} = req.params;
 
   try {
     const userDoc = await getDocument("users", id);
-    
+
     if (!userDoc.exists) {
       return res.status(404).json({
         error: "UserNotFound",
-        message: generalDictionary(language, "UserNotFound")
+        message: generalDictionary(language, "UserNotFound"),
       });
     }
 
     const userData = userDoc.data();
-    
+
     if (userData.uid) {
       try {
         await admin.auth().deleteUser(userData.uid);
@@ -203,16 +201,15 @@ router.delete("/user/:id", userSchema.delete, async (req, res) => {
       deletedUser: {
         id: id,
         email: userData.email,
-        displayName: userData.displayName
-      }
+        displayName: userData.displayName,
+      },
     });
-
   } catch (error) {
     console.error("Error deleting user:", error);
-    
+
     return res.status(500).json({
       error: "InternalServerError",
-      message: generalDictionary(language, "InternalServerError")
+      message: generalDictionary(language, "InternalServerError"),
     });
   }
 });
