@@ -340,7 +340,8 @@ module.exports = {
     }
   },
 
-  // --------------------------------------------------Autenticación--------------------------------------------------
+
+  //--------------------------------------------------Autenticación--------------------------------------------------
   generateToken: async (data) => {
     const expiresIn = 60 * 20; // 20 minutos
     const token = jwt.sign(data, secretKeyJWT, {expiresIn});
@@ -394,6 +395,7 @@ module.exports = {
       params: JSON.stringify({token: accessToken}),
     };
     const response = await axios.get(wialonURL, {params});
+
     return response.data.eid;
   },
   fetchAllUnitsWialon: async (sid) => {
@@ -420,6 +422,7 @@ module.exports = {
   },
   isUnitReportingWialon: (unitData, allowedInterval = 3600) => {
     // 1 hora
+
     const currentTime = Math.floor(Date.now() / 1000);
 
     const lastMsgTime = unitData?.lmsg?.t || 0; // Tiempo del último mensaje
@@ -470,4 +473,5 @@ module.exports = {
       return key;
     }
   },
+
 };

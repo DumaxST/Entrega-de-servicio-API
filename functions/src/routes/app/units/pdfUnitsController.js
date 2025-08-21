@@ -1,5 +1,6 @@
 const {cachedAsync} = require("../../../middlewares");
 const {ClientError} = require("../../../middlewares/errors");
+
 const {
   getSidFromToken,
   fetchAllUnitsWialon,
@@ -13,6 +14,7 @@ const axios = require("axios");
 
 const generatePdf = async (data, outputPath) => {
   const doc = new PDFDocument({margin: 50});
+
   const stream = fs.createWriteStream(outputPath);
 
   doc.pipe(stream);
@@ -24,6 +26,7 @@ const generatePdf = async (data, outputPath) => {
     .fillColor("#FFFFFF")
     .fontSize(20)
     .text("Reporte de Unidades", 50, 15, {align: "center"})
+
     .fillColor("#000000");
 
   doc.moveDown(2);
@@ -33,6 +36,7 @@ const generatePdf = async (data, outputPath) => {
     doc
       .fontSize(14)
       .text("No hay unidades reportando momentáneamente.", {align: "center"});
+
     doc.end();
     return new Promise((resolve, reject) => {
       stream.on("finish", () => resolve(outputPath));
@@ -48,6 +52,7 @@ const generatePdf = async (data, outputPath) => {
   doc
     .fontSize(14)
     .text("Resumen:", {underline: true})
+
     .moveDown(0.5)
     .fontSize(12)
     .text(`Total de Unidades: ${data.totalUnits}`)
@@ -83,6 +88,7 @@ const generatePdf = async (data, outputPath) => {
   const chartUrl = await chart.getShortUrl();
 
   const response = await axios.get(chartUrl, {responseType: "arraybuffer"});
+
   const chartImage = Buffer.from(response.data, "binary");
 
   doc.image(chartImage, doc.page.width - chartWidth - 50, summaryStartY, {
@@ -120,6 +126,7 @@ const generatePdf = async (data, outputPath) => {
     data.reportingUnits.length,
     data.nonReportingUnits.length
   );
+
 
   for (let i = 0; i < maxRows; i++) {
     if (y > doc.page.height - 50) {
@@ -165,6 +172,7 @@ const generatePdf = async (data, outputPath) => {
       doc
         .fontSize(10)
         .text(`- ${unit.nm} (ID: ${unit.id})`, 55 + columnWidth, y + 5);
+
     }
 
     y += rowHeight;
