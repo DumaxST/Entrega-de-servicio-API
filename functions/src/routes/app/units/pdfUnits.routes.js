@@ -1,5 +1,6 @@
 // Express
-const { Router } = require("express");
+const {Router} = require("express");
+
 const router = Router();
 
 // Middlewares
@@ -7,8 +8,9 @@ const router = Router();
 const controller = require("./pdfUnitsController");
 // const unitsSchema = require("./unitsSchema");
 
-// ---------------------------------------- RUTAS ---------------------------------------- 
+// ---------------------------------------- RUTAS ----------------------------------------
 
 router.get("/units/pdf", controller.getPdfUnits);
 
 module.exports = router;
+

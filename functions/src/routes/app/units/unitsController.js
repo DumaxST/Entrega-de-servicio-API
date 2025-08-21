@@ -1,5 +1,6 @@
-const { response, cachedAsync } = require("../../../middlewares");
-const { ClientError } = require("../../../middlewares/errors");
+const {response, cachedAsync} = require("../../../middlewares");
+const {ClientError} = require("../../../middlewares/errors");
+
 const {
   getSidFromToken,
   fetchAllUnitsWialon,
@@ -19,11 +20,12 @@ const getReport = async (req, res) => {
 
   const reportingUnits = units
     .filter((unit) => isUnitReportingWialon(unit))
-    .map((unit) => ({ nm: unit.nm, id: unit.id }));
+    .map((unit) => ({nm: unit.nm, id: unit.id}));
 
   const nonReportingUnits = units
     .filter((unit) => !isUnitReportingWialon(unit))
-    .map((unit) => ({ nm: unit.nm, id: unit.id }));
+    .map((unit) => ({nm: unit.nm, id: unit.id}));
+
 
   const totalUnits = units.length;
   const effectiveness = ((reportingUnits.length / totalUnits) * 100).toFixed(2);

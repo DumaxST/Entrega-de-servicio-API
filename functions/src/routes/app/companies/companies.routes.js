@@ -1,5 +1,5 @@
 // Express
-const { Router } = require("express");
+const {Router} = require("express");
 const router = Router();
 
 // Middlewares
@@ -7,7 +7,7 @@ const router = Router();
 const controller = require("./companiesController");
 // const companiesSchema = require("./companiesSchema");
 
-// ---------------------------------------- RUTAS ---------------------------------------- 
+// ---------------------------------------- RUTAS ----------------------------------------
 
 router.get("/companies", controller.get);
 
