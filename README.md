@@ -12,9 +12,9 @@ Status : in-progress
 
 Make sure you have the follosing installed:
 
-- [Git](https://git-scm.com/) `>=2.13`
+- [Git](https://git-scm.com/) `>=2.34`
 - [Node.js](https://nodejs.org/) `>=20`
-- [npm](https://docs.npmjs.com/) `>=8.16.0`
+- [npm](https://docs.npmjs.com/) `>=10.82`
 
 Verify installation with:
 

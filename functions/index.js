@@ -1,7 +1,11 @@
 // Dependencias Firebase
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-require("dotenv").config();
+
+// Load environment variables with fallback for Firebase Functions
+if (process.env.NODE_ENV !== 'production') {
+  require("dotenv").config();
+}
 
 // Dependencias de 18next
 const middleware = require("i18next-http-middleware");
@@ -17,33 +21,34 @@ const cookieParser = require("cookie-parser");
 const ErrorHandler = require("./src/middlewares/errorHandler");
 const {languageTranslation} = require("./src/middlewares");
 
-// Configuración de serviceAccount
-const serviceAccount ={
-  type: process.env.FIREBASE_TYPE,
-  project_id: process.env.FIREBASE_PROJECT_ID,
-  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
-  private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
-  client_email: process.env.FIREBASE_CLIENT_EMAIL,
-  client_id: process.env.FIREBASE_CLIENT_ID,
-  auth_uri: process.env.FIREBASE_AUTH_URI,
-  token_uri: process.env.FIREBASE_TOKEN_URI,
-  auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
-  client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
-  universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN
+// Configuración de serviceAccount con fallbacks para Firebase Functions
+const serviceAccount = {
+  type: process.env.FB_TYPE || "service_account",
+  project_id: process.env.FB_PROJECT_ID || "service-delivery-development",
+  private_key_id: process.env.FB_PRIVATE_KEY_ID,
+  private_key: process.env.FB_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+  client_email: process.env.FB_CLIENT_EMAIL,
+  client_id: process.env.FB_CLIENT_ID,
+  auth_uri: process.env.FB_AUTH_URI || "https://accounts.google.com/o/oauth2/auth",
+  token_uri: process.env.FB_TOKEN_URI || "https://oauth2.googleapis.com/token",
+  auth_provider_x509_cert_url: process.env.FB_AUTH_PROVIDER_X509_CERT_URL || "https://www.googleapis.com/oauth2/v1/certs",
+  client_x509_cert_url: process.env.FB_CLIENT_X509_CERT_URL,
+  universe_domain: process.env.FB_UNIVERSE_DOMAIN || "googleapis.com"
 };
 
-//  rutas
-const {producRouter} = require("./src/routes");
-// Inicializar Firebase Admin SDK
+// Inicializar Firebase Admin SDK FIRST
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  storageBucket: process.env.FB_STORAGE_BUCKET || "gs://service-delivery-development.firebasestorage.app",
 });
+
+// Import routes AFTER Firebase initialization
+const {producRouter} = require("./src/routes");
 
 // Bucket de almacenemaiento
 const bucket = admin
   .storage()
-  .bucket(process.env.FIREBASE_STORAGE_BUCKET);
+  .bucket(process.env.FB_STORAGE_BUCKET || "gs://service-delivery-development.firebasestorage.app");
 exports.bucket = bucket;
 
 // Inicializar i18next
@@ -55,8 +60,11 @@ i18next
     backend: {loadPath: "./dictionary/{{lng}}.json"},
   });
 
-// Orígenes permitidos
-const origins = [process.env.ORIGIN1, process.env.ORIGIN2];
+// Orígenes permitidos - with Firebase Functions config fallback
+const origins = [
+  process.env.ORIGIN1 || functions.config().origin?.one,
+  process.env.ORIGIN2 || "http://localhost:5173"
+];
 
 // Crear aplicación Express configurada
 const createApp = (routes) => {
