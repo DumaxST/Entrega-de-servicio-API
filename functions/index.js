@@ -1,12 +1,3 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
-
 // Dependencias Firebase
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
@@ -20,25 +11,36 @@ const i18next = require("i18next");
 // Otras dependencias
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 // Middlewares
 const ErrorHandler = require("./src/middlewares/errorHandler");
 const {languageTranslation} = require("./src/middlewares");
 
 // Configuración de serviceAccount
-const serviceAccount = require("./serviceAccount.json");
-const cookieParser = require("cookie-parser");
-
+const serviceAccount ={
+  type: process.env.FIREBASE_TYPE,
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  client_id: process.env.FIREBASE_CLIENT_ID,
+  auth_uri: process.env.FIREBASE_AUTH_URI,
+  token_uri: process.env.FIREBASE_TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+  client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
+  universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN
+};
 // Inicializar Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "gs://service-delivery-development.firebasestorage.app",
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
 });
 
 // Bucket de almacenemaiento
 const bucket = admin
   .storage()
-  .bucket("gs://service-delivery-development.firebasestorage.app");
+  .bucket(process.env.FIREBASE_STORAGE_BUCKET);
 exports.bucket = bucket;
 
 // Inicializar i18next
@@ -115,23 +117,16 @@ const appRoutes = [
   require("./src/routes/app/units/pdfUnits.routes"),
 ];
 
-// const serviceDeliveryRoutes = []
-// const torreDeControlRoutes = []
 
-// Crear instancias para app, serviceDelivery y torreDeControl
+// Crear instancias para app, serviceDelivery
 const App = createApp(appRoutes);
-// const ServiceDelivery = createApp(serviceDeliveryRoutes);
-// const TorreDeControl = createApp(torreDeControlRoutes);
 
 // Exportar para Firebase Functions
 exports.app = functions.https.onRequest(App);
-// exports.serviceDelivery = functions.https.onRequest(ServiceDelivery);
-// exports.torreDeControl = functions.https.onRequest(TorreDeControl);
 
 // Exportar para Supertest
 if (process.env.NODE_ENV === "test") {
   module.exports = {
     App,
-    // , ServiceDelivery, TorreDeControl
   };
 }
