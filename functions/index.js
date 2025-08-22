@@ -31,6 +31,9 @@ const serviceAccount ={
   client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
   universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN
 };
+
+//  rutas
+const {producRouter} = require("./src/routes");
 // Inicializar Firebase Admin SDK
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -115,6 +118,7 @@ const appRoutes = [
   require("./src/routes/app/users/users.routes"),
   require("./src/routes/general/auth/authUser.routes"),
   require("./src/routes/app/units/pdfUnits.routes"),
+  producRouter
 ];
 
 
