@@ -1,4 +1,9 @@
-const { createDocument } = require("../../ccFunctions");
+const { 
+    createDocument, 
+    getDocument,
+    getDocuments,
+    updateDocument
+} = require("../../ccFunctions");
 
 class ProductController {
     static async createProduct(req, res) {
@@ -23,31 +28,58 @@ class ProductController {
     }
     
     // READ
-    static getAllProducts(req, res) {
-        res.json([
-            { id: 1, name: "Wialon" },
-            { id: 2, name: "Mapon" },
-        ]);
+    static async getAllProducts(req, res) {
+        try {
+            const products = await getDocuments("products");
+            console.log(products)
+            res.status(200).json({ products });
+        } catch (error) {
+            res.status(500).json({ error: "Error fetching products" });
+        }
     }
     
-    static getProductById(req, res) {
-        const { id } = req.params;
-        res.json({ id, name: `Product ${id}` });
-    }
-    
-    static getProductByClient(req, res) {
-        const { clientId } = req.params;
-        res.json({ 
-            clientId, 
-            products: [`Product 1 for Client ${clientId}`, `Product 2 for Client ${clientId}`] 
-        });
+    static async getProductById(req, res) {
+        try {
+            const { id } = req.params;
+            const product = await getDocument("products", id);
+
+            if (!product) {
+                return res.status(404).json({ error: "Product not found" });
+            }
+
+            res.status(200).json({ product });
+
+        } catch (error) {
+
+            res.status(500).json({ error: "Error fetching product" });
+
+        }
     }
 
+    static async getProductByClient(req, res) {
+        try {
+            const { clientId } = req.params;
+            const products = await getDocuments("products", { clientId });
+            res.status(200).json({ clientId, products });
+        } catch (error) {
+            res.status(500).json({ error: "Error fetching products for client" });
+        }
+    }
+    
     // UPDATE
-    static updateProduct(req, res) {
-        const { id } = req.params;
-        const updatedProduct = req.body;
-        res.json({ id, ...updatedProduct });
+    static async updateProduct(req, res) {
+        try {
+            const { id } = req.params;
+            const updatedProduct = req.body;
+            const product = await getDocument("products", id);
+            if (!product) {
+                return res.status(404).json({ error: "Product not found" });
+            }
+            const result = await updateDocument("products", id, updatedProduct);
+            res.status(200).json({ id, ...result });
+        } catch (error) {
+            res.status(500).json({ error: "Error updating product" });
+        }
     }
 }
 module.exports = ProductController;
