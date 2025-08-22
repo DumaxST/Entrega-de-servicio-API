@@ -1,8 +1,7 @@
 const {check, validationResult} = require("express-validator");
-const {getDocument, getDocuments} = require("../../../../ccFunctions");
+const {getDocuments} = require("../../../../ccFunctions");
 
 const {
-  checkIfEmailIsRegistered,
   expressDictionary,
   generalDictionary,
   getUserByEmail,

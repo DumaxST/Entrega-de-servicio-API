@@ -1,11 +1,6 @@
 const {Router} = require("express");
 const router = Router();
 
-// const bucket = require("../../../index").bucket;
-// const variables = require("../../../envConfig.js");
-
-// const { FieldValue } = require("firebase-admin/firestore");
-const {checkSchema, validationResult} = require("express-validator");
 const userSchema = require("./usersSchemas.js");
 
 const {
@@ -19,6 +14,7 @@ const {
   generalDictionary,
   validationErrorsExpress,
 } = require("../../../../generalFunctions.js");
+
 const admin = require("firebase-admin");
 
 router.post("/user", userSchema.post, async (req, res) => {
@@ -82,7 +78,7 @@ router.put("/user/:id", userSchema.put, async (req, res) => {
 
   const language = req?.query?.lang;
   const {id} = req.params;
-  const {firstName, lastName, email, phone, role, profilePicture} = req?.body;
+  const {firstName, lastName, email, phone, role, profilePicture} = req.body;
 
   try {
     const userDoc = await getDocument("users", id);
