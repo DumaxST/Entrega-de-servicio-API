@@ -1,7 +1,7 @@
 const admin = require("firebase-admin");
 const db = admin.firestore();
 const {FieldValue} = require("firebase-admin/firestore");
-const {checkSchema, validationResult} = require("express-validator");
+const {validationResult} = require("express-validator");
 
 require("dotenv").config();
 const secretKeyJWT = process.env.JWT_SECRET;
@@ -32,7 +32,7 @@ module.exports = {
       return itemToReturn;
     } catch (error) {
       console.error(`Error getting document: ${error}`);
-      throw new Error("Error getting document");
+      throw new Error(`Error getting document ${error}`);
     }
   },
   getDocuments: async (ref, qry, order) => {
@@ -63,7 +63,8 @@ module.exports = {
       return results;
     } catch (error) {
       console.error("Error en getDocuments:", error);
-      throw new Error("Error getting documents");
+      throw new Error(`Error getting document ${error}`);
+
     }
   },
   getDocumentCollections: async (ref, id) => {
@@ -166,7 +167,6 @@ module.exports = {
     const validation = validationResult(req);
     let err = false;
     if (!validation.isEmpty()) {
-      const error = validation.errors[0];
       const status = 422;
 
       // if (errorMessages.includes(error.msg)) {
@@ -341,7 +341,7 @@ module.exports = {
   },
 
 
-  //--------------------------------------------------Autenticación--------------------------------------------------
+  // --------------------------------------------------Autenticación--------------------------------------------------
   generateToken: async (data) => {
     const expiresIn = 60 * 20; // 20 minutos
     const token = jwt.sign(data, secretKeyJWT, {expiresIn});
