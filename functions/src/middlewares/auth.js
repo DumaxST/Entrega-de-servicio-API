@@ -49,8 +49,6 @@ const validateRefreshToken = (req, res, next) => {
 
 const validateAuthTokenFirebase = async (req, res, next) => {
   try {
-   
-
     // Info del cliente
     const tokenAuth = req.body.tokenAuth;
 
@@ -72,7 +70,6 @@ const validateAuthTokenFirebase = async (req, res, next) => {
     next(err);
   }
 };
-
 
 module.exports = {
   validateToken,

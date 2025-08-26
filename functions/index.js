@@ -3,7 +3,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
 // Load environment variables with fallback for Firebase Functions
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
@@ -29,17 +29,22 @@ const serviceAccount = {
   private_key: process.env.FB_PRIVATE_KEY?.replace(/\\n/g, "\n"),
   client_email: process.env.FB_CLIENT_EMAIL,
   client_id: process.env.FB_CLIENT_ID,
-  auth_uri: process.env.FB_AUTH_URI || "https://accounts.google.com/o/oauth2/auth",
+  auth_uri:
+    process.env.FB_AUTH_URI || "https://accounts.google.com/o/oauth2/auth",
   token_uri: process.env.FB_TOKEN_URI || "https://oauth2.googleapis.com/token",
-  auth_provider_x509_cert_url: process.env.FB_AUTH_PROVIDER_X509_CERT_URL || "https://www.googleapis.com/oauth2/v1/certs",
+  auth_provider_x509_cert_url:
+    process.env.FB_AUTH_PROVIDER_X509_CERT_URL ||
+    "https://www.googleapis.com/oauth2/v1/certs",
   client_x509_cert_url: process.env.FB_CLIENT_X509_CERT_URL,
-  universe_domain: process.env.FB_UNIVERSE_DOMAIN || "googleapis.com"
+  universe_domain: process.env.FB_UNIVERSE_DOMAIN || "googleapis.com",
 };
 
 // Inicializar Firebase Admin SDK FIRST
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: process.env.FB_STORAGE_BUCKET || "gs://service-delivery-development.firebasestorage.app",
+  storageBucket:
+    process.env.FB_STORAGE_BUCKET ||
+    "gs://service-delivery-development.firebasestorage.app",
 });
 
 // Import routes AFTER Firebase initialization
@@ -48,7 +53,10 @@ const {producRouter} = require("./src/routes");
 // Bucket de almacenemaiento
 const bucket = admin
   .storage()
-  .bucket(process.env.FB_STORAGE_BUCKET || "gs://service-delivery-development.firebasestorage.app");
+  .bucket(
+    process.env.FB_STORAGE_BUCKET ||
+      "gs://service-delivery-development.firebasestorage.app"
+  );
 exports.bucket = bucket;
 
 // Inicializar i18next
@@ -63,7 +71,10 @@ i18next
 // Orígenes permitidos - with Firebase Functions config fallback
 const origins = [
   process.env.ORIGIN1 || functions.config().origin?.one,
-  process.env.ORIGIN2 || "http://localhost:5173"
+  process.env.ORIGIN2 || "http://localhost:5173",
+  "http://localhost:5173", // Development frontend
+  "http://127.0.0.1:5173", // Alternative localhost
+  "http://localhost:3000", // Alternative frontend port
 ];
 
 // Crear aplicación Express configurada
@@ -74,17 +85,36 @@ const createApp = (routes) => {
   app.use(
     cors({
       origin: function (origin, callback) {
-        if (!origin || origins.includes(origin)) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        // For development, allow localhost and 127.0.0.1 on any port
+        if (process.env.NODE_ENV !== "production") {
+          if (origin.includes("localhost") || origin.includes("127.0.0.1")) {
+            return callback(null, true);
+          }
+        }
+        
+        // Check allowed origins
+        if (origins.includes(origin)) {
           callback(null, true);
         } else {
+          console.error(`CORS blocked origin: ${origin}`);
           callback(new Error("Not allowed by CORS"));
         }
       },
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With", "role"],
+      allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "Accept",
+        "Origin",
+        "X-Requested-With",
+        "role",
+      ],
       preflightContinue: false,
-      optionsSuccessStatus: 200
+      optionsSuccessStatus: 200,
     })
   );
 
@@ -126,9 +156,8 @@ const appRoutes = [
   require("./src/routes/app/users/users.routes"),
   require("./src/routes/general/auth/authUser.routes"),
   require("./src/routes/app/units/pdfUnits.routes"),
-  producRouter
+  producRouter,
 ];
-
 
 // Crear instancias para app, serviceDelivery
 const App = createApp(appRoutes);

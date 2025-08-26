@@ -26,7 +26,6 @@ const getReport = async (req, res) => {
     .filter((unit) => !isUnitReportingWialon(unit))
     .map((unit) => ({nm: unit.nm, id: unit.id}));
 
-
   const totalUnits = units.length;
   const effectiveness = ((reportingUnits.length / totalUnits) * 100).toFixed(2);
 
