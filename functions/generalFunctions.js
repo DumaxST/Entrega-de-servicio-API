@@ -64,7 +64,6 @@ module.exports = {
     } catch (error) {
       console.error("Error en getDocuments:", error);
       throw new Error(`Error getting document ${error}`);
-
     }
   },
   getDocumentCollections: async (ref, id) => {
@@ -340,7 +339,6 @@ module.exports = {
     }
   },
 
-
   // --------------------------------------------------Autenticación--------------------------------------------------
   generateToken: async (data) => {
     const expiresIn = 60 * 20; // 20 minutos
@@ -473,5 +471,4 @@ module.exports = {
       return key;
     }
   },
-
 };

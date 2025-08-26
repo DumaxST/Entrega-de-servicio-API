@@ -13,4 +13,3 @@ const controller = require("./pdfUnitsController");
 router.get("/units/pdf", controller.getPdfUnits);
 
 module.exports = router;
-
