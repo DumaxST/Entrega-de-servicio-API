@@ -473,5 +473,25 @@ module.exports = {
       return key;
     }
   },
-
+  // This function, when used with a master account's SID, fetches all units
+ fetchAllUnitsWialon2: async(sid) =>{
+  const params = {
+    svc: "core/search_items",
+    params: JSON.stringify({
+      spec: {
+        itemsType: "avl_unit",
+        propName: "sys_name,rel_last_msg_date",
+        propValueMask: "*",
+        sortType: "sys_name",
+      },
+      force: 1,
+      flags: 1025, // Includes position data
+      from: 0,
+      to: 0, // Gets all units, not just the first 10
+    }),
+    sid: sid,
+  };
+  const response = await axios.get(wialonURL, { params });
+  return response.data.items;
+}
 };
