@@ -44,6 +44,7 @@ admin.initializeApp({
 
 // Import routes AFTER Firebase initialization
 const {producRouter} = require("./src/routes");
+const  AppRoutes = require("./src/presentation/routes");
 
 // Bucket de almacenemaiento
 const bucket = admin
@@ -119,19 +120,20 @@ const createApp = (routes) => {
 };
 
 // Rutas de la aplicación
-const appRoutes = [
-  require("./src/routes/app/companies/companies.routes"),
-  require("./src/routes/app/groups/groups.routes"),
-  require("./src/routes/app/units/units.routes"),
-  require("./src/routes/app/users/users.routes"),
-  require("./src/routes/general/auth/authUser.routes"),
-  require("./src/routes/app/units/pdfUnits.routes"),
-  producRouter
-];
+// const appRoutes = [
+//   require("./src/routes/app/companies/companies.routes"),
+//   require("./src/routes/app/groups/groups.routes"),
+//   require("./src/routes/app/units/units.routes"),
+//   require("./src/routes/app/users/users.routes"),
+//   require("./src/routes/general/auth/authUser.routes"),
+//   require("./src/routes/app/units/pdfUnits.routes"),
+//   producRouter, 
+ 
+// ];
 
 
 // Crear instancias para app, serviceDelivery
-const App = createApp(appRoutes);
+const App = createApp( AppRoutes.routes);
 
 // Exportar para Firebase Functions
 exports.app = functions.https.onRequest(App);

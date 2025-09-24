@@ -1,7 +1,6 @@
 
 const { Router } = require("express");
-const { AuthController } = require("../../../controllers");
-
+const AuthController = require("../../../presentation/auth/controller");
 const router = Router();
 
 router.post("/login", AuthController.login);
