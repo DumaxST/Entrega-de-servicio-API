@@ -3,7 +3,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
 // Load environment variables with fallback for Firebase Functions
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
@@ -23,17 +23,17 @@ const {languageTranslation} = require("./src/middlewares");
 
 // Configuración de serviceAccount con fallbacks para Firebase Functions
 const serviceAccount = {
-  type: process.env.FB_TYPE || "service_account",
-  project_id: process.env.FB_PROJECT_ID || "service-delivery-development",
+  type: process.env.FB_TYPE,
+  project_id: process.env.FB_PROJECT_ID,
   private_key_id: process.env.FB_PRIVATE_KEY_ID,
   private_key: process.env.FB_PRIVATE_KEY?.replace(/\\n/g, "\n"),
   client_email: process.env.FB_CLIENT_EMAIL,
   client_id: process.env.FB_CLIENT_ID,
-  auth_uri: process.env.FB_AUTH_URI || "https://accounts.google.com/o/oauth2/auth",
-  token_uri: process.env.FB_TOKEN_URI || "https://oauth2.googleapis.com/token",
-  auth_provider_x509_cert_url: process.env.FB_AUTH_PROVIDER_X509_CERT_URL || "https://www.googleapis.com/oauth2/v1/certs",
+  auth_uri: process.env.FB_AUTH_URI ,
+  token_uri: process.env.FB_TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.FB_AUTH_PROVIDER_X509_CERT_URL,
   client_x509_cert_url: process.env.FB_CLIENT_X509_CERT_URL,
-  universe_domain: process.env.FB_UNIVERSE_DOMAIN || "googleapis.com"
+  universe_domain: process.env.FB_UNIVERSE_DOMAIN 
 };
 
 // Inicializar Firebase Admin SDK FIRST
@@ -43,7 +43,7 @@ admin.initializeApp({
 });
 
 // Import routes AFTER Firebase initialization
-const {producRouter} = require("./src/routes");
+const  AppRoutes = require("./src/presentation/routes");
 
 // Bucket de almacenemaiento
 const bucket = admin
@@ -119,19 +119,20 @@ const createApp = (routes) => {
 };
 
 // Rutas de la aplicación
-const appRoutes = [
-  require("./src/routes/app/companies/companies.routes"),
-  require("./src/routes/app/groups/groups.routes"),
-  require("./src/routes/app/units/units.routes"),
-  require("./src/routes/app/users/users.routes"),
-  require("./src/routes/general/auth/authUser.routes"),
-  require("./src/routes/app/units/pdfUnits.routes"),
-  producRouter
-];
+// const appRoutes = [
+//   require("./src/routes/app/companies/companies.routes"),
+//   require("./src/routes/app/groups/groups.routes"),
+//   require("./src/routes/app/units/units.routes"),
+//   require("./src/routes/app/users/users.routes"),
+//   require("./src/routes/general/auth/authUser.routes"),
+//   require("./src/routes/app/units/pdfUnits.routes"),
+//   producRouter, 
+ 
+// ];
 
 
 // Crear instancias para app, serviceDelivery
-const App = createApp(appRoutes);
+const App = createApp( AppRoutes.routes);
 
 // Exportar para Firebase Functions
 exports.app = functions.https.onRequest(App);
