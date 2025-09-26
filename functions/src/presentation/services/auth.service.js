@@ -34,5 +34,35 @@ class  AuthService {
             throw CustomError.internalServer("Error creating user");
         }
     }
+    async loginUser(loginDto){
+        try {
+            const userRecord = await getAuth().getUserByEmail(loginDto.email);
+            
+            if (!userRecord) {
+                throw CustomError.unauthorized("Invalid credentials");
+            }
+
+            const {...props} = UserEntity.fromObject(userRecord);
+            
+            return {
+                ...props,
+                token: "fake-jwt-token"
+            };
+        } catch (error) {
+            console.log("Error during login:", error);
+            
+            if (error.code === "auth/user-not-found") {
+                throw CustomError.unauthorized("Invalid credentials");
+            }
+            if (error.code === "auth/invalid-email") {
+                throw CustomError.badRequest("Invalid email format");
+            }
+            if (error instanceof CustomError) {
+                throw error;
+            }
+            
+            throw CustomError.internalServer("Login failed");
+        }
+    }
 }
 module.exports = AuthService;

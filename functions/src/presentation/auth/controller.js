@@ -1,4 +1,4 @@
-const { userDto, UserEntity } = require("../../domain");
+const { userDto, loginDto, UserEntity } = require("../../domain");
 const { CustomError } = require("../../domain");
 
 class AuthController {
@@ -27,7 +27,18 @@ class AuthController {
   }
 
   login = (req, res) => {
-    res.json("login user");
+    const [error, loginDto] = loginDto.create(req.body);
+
+    if (error) return res.status(400).json({ error });
+
+    this.authService.loginUser(loginDto)
+      .then((user) => {
+        res.json({
+          message: "Login successful",
+          user
+        });
+      })
+      .catch((error) => this.handleError(error, res));
   }
 
   logout = (req, res) => {
