@@ -1,6 +1,8 @@
 const {Router} = require("express");
 const router = Router();
 
+const UserController = require("../../../controllers/UserController");
+
 const userSchema = require("./usersSchemas.js");
 
 const {
@@ -16,6 +18,19 @@ const {
 } = require("../../../../generalFunctions.js");
 
 const admin = require("firebase-admin");
+
+router.post("/users", UserController.createUser);
+router.get("/users", UserController.getAllUsers);
+router.get("/users/:id", UserController.getUserById);
+router.get("/users/email/:email", UserController.getUserByEmail);
+router.get("/users/role/:role", UserController.getUsersByRole);
+router.get("/users/status/:status", UserController.getUsersByStatus);
+router.get("/users/client/:clientId", UserController.getUsersByClient);
+router.get("/users/department/:department", UserController.getUsersByDepartment);
+router.put("/users/:id", UserController.updateUser);
+router.put("/users/:id/permissions", UserController.updateUserPermissions);
+router.put("/users/:id/lastLogin", UserController.updateLastLogin);
+router.delete("/users/:id", UserController.deleteUser);
 
 router.post("/user", userSchema.post, async (req, res) => {
   // if (validationErrorsExpress(req, res)) return;
