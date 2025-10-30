@@ -1,2 +1,2 @@
-declare function main(): void;
+export {};
 //# sourceMappingURL=index.d.ts.map

@@ -2,6 +2,10 @@
 // Dependencias Firebase
 // import * as functions from "firebase-functions";
 // import * as admin from "firebase-admin";
+Object.defineProperty(exports, "__esModule", { value: true });
+const envs_1 = require("./src/config/envs");
+const server_1 = require("./src/presentation/server");
+const routes_1 = require("./src/presentation/routes");
 // Load environment variables with fallback for Firebase Functions
 // if (process.env.NODE_ENV !== 'production') {
 //   require("dotenv").config();
@@ -138,5 +142,10 @@
 })();
 function main() {
     console.log("Hello World");
+    const server = new server_1.Server({
+        port: envs_1.envs.port,
+        routes: routes_1.AppRoutes.routes,
+    });
+    server.start();
 }
 //# sourceMappingURL=index.js.map

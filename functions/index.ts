@@ -2,6 +2,10 @@
 // import * as functions from "firebase-functions";
 // import * as admin from "firebase-admin";
 
+import { envs } from "./src/config/envs";
+import { Server } from "./src/presentation/server";
+import { AppRoutes } from "./src/presentation/routes";
+
 // Load environment variables with fallback for Firebase Functions
 // if (process.env.NODE_ENV !== 'production') {
 //   require("dotenv").config();
@@ -162,4 +166,10 @@
 
 function main(){
   console.log("Hello World")
+  const server = new Server({ 
+    port: envs.port,
+    routes: AppRoutes.routes,
+
+  });
+  server.start();
 }
