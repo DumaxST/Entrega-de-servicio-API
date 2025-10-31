@@ -10,19 +10,14 @@ export class AppRoutes{
     static get routes(): Router{
         const router = Router();
 
-        router.use("api/accounts", AccountsRoutes.routes);
-        router.use("api/devices", DeviceRoutes.routes);
-        router.use("api/clients", ClientRoutes.routes);
-        router.use("api/platforms", PlatformRoutes.routes);
-        router.use("api/system-config", SystemConfigRoutes.routes);
-        router.use("api/users", UserRoutes.routes);
-        
+        router.use("/account", AccountsRoutes.routes);
+        router.use("/device", DeviceRoutes.routes);
+        router.use("/client", ClientRoutes.routes);
+        router.use("/platform", PlatformRoutes.routes);
+        router.use("/system-config", SystemConfigRoutes.routes);
+        router.use("/user", UserRoutes.routes);
+       
         return router;
     }
 }
         
-        return router;
-
-    }
-    
-}

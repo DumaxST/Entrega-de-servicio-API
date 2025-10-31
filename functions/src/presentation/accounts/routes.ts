@@ -6,11 +6,12 @@ export class AccountsRoutes {
         const router = Router();
         const accountController = new AccountController();
 
-        router.get("/accounts", accountController.getAccounts);
-        router.post("/accounts", accountController.createAccount);
-        router.get("/accounts/:id", accountController.getAccountById);
-        router.put("/accounts/:id", accountController.updateAccount);
-        router.delete("/accounts/:id", accountController.deleteAccount);
+        router.get("/", accountController.getAccounts);
+        router.post("/", accountController.createAccount);
+        
+        router.get("/:id", accountController.getAccountById);
+        router.put("/:id", accountController.updateAccount);
+        router.delete("/:id", accountController.deleteAccount);
         return router;
 
     }
