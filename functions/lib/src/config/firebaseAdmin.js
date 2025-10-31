@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FieldValue = exports.auth = exports.db = void 0;
+exports.Timestamp = exports.FieldValue = exports.auth = exports.db = void 0;
 const admin = __importStar(require("firebase-admin"));
 const envs_1 = require("./envs");
 const serviceAccount_json_1 = __importDefault(require("./../serviceAccount.json"));
@@ -47,4 +47,5 @@ admin.initializeApp({
 exports.db = admin.firestore();
 exports.auth = admin.auth();
 exports.FieldValue = admin.firestore.FieldValue;
+exports.Timestamp = admin.firestore.Timestamp;
 //# sourceMappingURL=firebaseAdmin.js.map
