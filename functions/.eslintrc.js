@@ -26,6 +26,33 @@ module.exports = {
       },
       rules: {},
     },
+    {
+      files: ["**/*.ts"],
+      parser: "@typescript-eslint/parser",
+      parserOptions: {
+        ecmaVersion: 2020,
+        project: "./tsconfig.json",
+      },
+      extends: [
+        "eslint:recommended",
+        "@typescript-eslint/recommended",
+        "google",
+        "prettier",
+      ],
+      plugins: ["@typescript-eslint", "prettier"],
+      rules: {
+        "no-restricted-globals": ["error", "name", "length"],
+        "prefer-arrow-callback": "error",
+        quotes: ["error", "double", {allowTemplateLiterals: true}],
+        "new-cap": "off",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "no-unused-vars": "off",
+        "require-jsdoc": "off",
+        "no-unsafe-optional-chaining": "warn",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-explicit-any": "warn",
+      },
+    },
   ],
   globals: {},
 };
