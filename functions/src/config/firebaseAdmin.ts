@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { envs } from "./envs";
 import serviceAccount from "./../serviceAccount.json";
 
@@ -9,5 +10,4 @@ admin.initializeApp({
 
 export const db = admin.firestore();
 export const auth = admin.auth();
-export const FieldValue = admin.firestore.FieldValue;
-export const Timestamp = admin.firestore.Timestamp; 
+export { FieldValue, Timestamp }; 

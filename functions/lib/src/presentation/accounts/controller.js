@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AccountController = void 0;
 const firebaseAdmin_1 = require("./../../config/firebaseAdmin");
-//Interfaces 
+const dtos_1 = require("./../../domain/dtos");
 class AccountController {
     constructor() {
         this.getAccounts = async (req, res) => {
@@ -46,14 +46,13 @@ class AccountController {
         };
         this.createAccount = async (req, res) => {
             try {
-                const { email, companyName, contactInfo } = req.body;
-                if (!email || !companyName) {
-                    return res.status(400).json({
-                        message: 'Error: email y companyName son requeridos.'
-                    });
+                const [error, createAccountDto] = dtos_1.CreateAccountDTO.create(req.body);
+                if (error) {
+                    return res.status(400).json({ message: `Error: ${error}` });
                 }
+                console.log(createAccountDto);
                 const accountsRef = firebaseAdmin_1.db.collection('accounts');
-                const snapshot = await accountsRef.where('email', '==', email)
+                const snapshot = await accountsRef.where('email', '==', createAccountDto.email)
                     .limit(1)
                     .get();
                 if (!snapshot.empty) {
@@ -61,12 +60,13 @@ class AccountController {
                 }
                 const newDocRef = accountsRef.doc();
                 const newAccountData = {
-                    email: email,
-                    companyName: companyName,
+                    email: createAccountDto.email,
+                    companyName: createAccountDto.companyName,
+                    status: createAccountDto.status,
                     contactInfo: {
-                        phone: contactInfo?.phone || null,
-                        city: contactInfo?.city || null,
-                        state: contactInfo?.state || null,
+                        phone: createAccountDto.contactInfo?.phone || null,
+                        city: createAccountDto.contactInfo?.city || null,
+                        state: createAccountDto.contactInfo?.state || null,
                     },
                     createdAt: firebaseAdmin_1.FieldValue.serverTimestamp(),
                 };
@@ -78,6 +78,7 @@ class AccountController {
                 });
             }
             catch (error) {
+                console.log(error);
                 if (error instanceof Error) {
                     if (error.message === 'EMAIL_EXISTS') {
                         return res.status(409).json({

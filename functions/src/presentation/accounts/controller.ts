@@ -1,7 +1,6 @@
 import { Request, Response, } from "express";
 import { db, FieldValue, Timestamp } from "./../../config/firebaseAdmin";
-
-
+import { CreateAccountDTO } from "./../../domain/dtos";
 export class AccountController {
 
     public getAccounts = async (req: Request, res: Response) => {
@@ -58,16 +57,16 @@ export class AccountController {
     public createAccount = async (req: Request, res: Response) => {
     try {
 
-        const { email, companyName, contactInfo } = req.body;
 
-        if (!email || !companyName) {
-            return res.status(400).json({
-                message: 'Error: email y companyName son requeridos.'
-            });
+       const [error, createAccountDto] = CreateAccountDTO.create(req.body);
+
+        if (error) {
+            return res.status(400).json({ message: `Error: ${error}` });
         }
+        console.log(createAccountDto)
         const accountsRef = db.collection('accounts');
 
-        const snapshot = await accountsRef.where('email', '==', email)
+        const snapshot = await accountsRef.where('email', '==', createAccountDto!.email)
             .limit(1)
             .get();
 
@@ -76,13 +75,13 @@ export class AccountController {
         }
         const newDocRef = accountsRef.doc();
         const newAccountData = {
-            email: email,
-            companyName: companyName,
-            status:'active',
+            email: createAccountDto!.email,
+            companyName: createAccountDto!.companyName,
+            status: createAccountDto!.status,
             contactInfo: {
-                phone: contactInfo?.phone || null,
-                city: contactInfo?.city || null,
-                state: contactInfo?.state || null,
+                phone: createAccountDto!.contactInfo?.phone || null,
+                city: createAccountDto!.contactInfo?.city || null,
+                state: createAccountDto!.contactInfo?.state || null,
             },
             createdAt: FieldValue.serverTimestamp(),
 
@@ -96,6 +95,7 @@ export class AccountController {
 
 
     } catch (error) {
+        console.log(error)
         if (error instanceof Error) {
             if (error.message === 'EMAIL_EXISTS') {
                 return res.status(409).json({

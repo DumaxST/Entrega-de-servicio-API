@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 export declare const db: admin.firestore.Firestore;
 export declare const auth: import("firebase-admin/auth").Auth;
-export declare const FieldValue: typeof admin.firestore.FieldValue;
-export declare const Timestamp: typeof admin.firestore.Timestamp;
+export { FieldValue, Timestamp };
 //# sourceMappingURL=firebaseAdmin.d.ts.map
