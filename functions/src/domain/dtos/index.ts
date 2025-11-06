@@ -4,3 +4,4 @@ export * from './devices';
 export * from './users';
 export * from './system-config';
 export * from './service-tickets';
+export * from './platforms';
