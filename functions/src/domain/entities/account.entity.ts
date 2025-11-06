@@ -1,10 +1,11 @@
+import { AccountStatus } from "domain/dtos";
+
 export interface ContactInfo {
     phone?: string | null;
     city?: string | null;
     state?: string | null;
 }
 
-export type AccountStatus = "active" | "inactive" | "suspended";
 export class AccountEntity {
     constructor(
         public readonly id: string,
