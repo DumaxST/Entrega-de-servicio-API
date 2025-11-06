@@ -1,16 +1,21 @@
 import { Router } from "express";
 import { DeviceController } from "./controller";
+import { DeviceDataSourceImp, DeviceRepositoryImp } from "../../infrastructure";
 
 export class DeviceRoutes {
     static get routes(): Router {
-        const router = Router();
-        const deviceController = new DeviceController();
+        const router = Router({ mergeParams: true }); // Important for nested routes!
 
-        router.get("/devices", deviceController.getDevices);
-        router.post("/devices", deviceController.createDevice);
-        router.get("/devices/:id", deviceController.getDeviceById);
-        router.put("/devices/:id", deviceController.updateDevice);
-        router.delete("/devices/:id", deviceController.deleteDevice);
+        const dataSource = new DeviceDataSourceImp();
+        const deviceRepository = new DeviceRepositoryImp(dataSource);
+        const deviceController = new DeviceController(deviceRepository);
+
+        // All routes are relative to /accounts/:accountId/devices
+        router.get("/", deviceController.getDevices);
+        router.post("/", deviceController.createDevice);
+        router.get("/:deviceId", deviceController.getDeviceById);
+        router.put("/:deviceId", deviceController.updateDevice);
+        router.delete("/:deviceId", deviceController.deleteDevice);
 
         return router;
 

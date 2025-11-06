@@ -3,7 +3,7 @@ import * as functions from "firebase-functions";
 // import * as admin from "firebase-admin";
 // Express
 import express from 'express';
-
+import compression from "compression";
 // cors 
 // import  cors from "cors";
 
@@ -51,6 +51,7 @@ const app = express();
 // Aplica los middlewares
 //app.use(cors({ origin: true }));
 app.use(express.json());
+app.use(compression());
 // Configura las rutas
 app.use(AppRoutes.routes);
 // Exporta la app como una función de Firebase

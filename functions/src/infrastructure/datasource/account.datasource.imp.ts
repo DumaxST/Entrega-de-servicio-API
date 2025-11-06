@@ -14,22 +14,36 @@ export class AccountDataSourceImp implements AccountDataSource {
     async createAccount(createAccountDto: CreateAccountDTO): Promise<AccountEntity> {
         const accountsRef = db.collection('accounts');
 
-        const snapshot = await accountsRef.where('email', '==', createAccountDto!.email)
+        // Verificar que el clientCode sea único
+        const snapshot = await accountsRef.where('clientCode', '==', createAccountDto!.clientCode)
             .limit(1)
             .get();
         if (!snapshot.empty) {
-            throw new Error('El email ya esta registrado.');
+            throw new Error('El código de cliente ya está registrado.');
         }
         const newDocRef = accountsRef.doc();
 
         const newAccountData = {
-            email: createAccountDto!.email,
+            clientCode: createAccountDto!.clientCode,
             companyName: createAccountDto!.companyName,
             status: createAccountDto!.status,
             contactInfo: {
-                phone: createAccountDto!.contactInfo?.phone || null,
-                city: createAccountDto!.contactInfo?.city || null,
-                state: createAccountDto!.contactInfo?.state || null,
+                phones: createAccountDto!.contactInfo.phones,
+                city: createAccountDto!.contactInfo.city,
+                state: createAccountDto!.contactInfo.state,
+                notificationEmails: createAccountDto!.contactInfo.notificationEmails,
+            },
+            accountManagerId: createAccountDto!.accountManagerId || null,
+            stats: createAccountDto!.stats || {
+                totalUnits: 0,
+                reportingUnits: 0,
+                nonReportingUnits: 0,
+                deliveryPercentage: 0,
+                status: "bueno",
+                instalacionesPendientes: 0,
+                renovacionesPendientes: 0,
+                reubicacionesPendientes: 0,
+                ticketsEscalados: 0
             },
             createdAt: FieldValue.serverTimestamp(),
 
@@ -100,14 +114,7 @@ export class AccountDataSourceImp implements AccountDataSource {
         if (!doc.exists) {
             throw new Error('La cuenta no existe.');
         }
-        if (updateAccountDto!.email) {
-            const snapshot = await db.collection('accounts')
-                .where('email', '==', updateAccountDto!.email)
-                .limit(1).get();
-            if (!snapshot.empty && snapshot.docs[0].id !== id) {
-                throw new Error('EMAIL_EXISTS');
-            }
-        }
+
         const dataToUpdate = updateAccountDto!.values;
 
         dataToUpdate.updatedAt = FieldValue.serverTimestamp();
