@@ -62,7 +62,10 @@ const schemas = {
     check("email", "SintaxError")
       .custom((value, {req}) => {
         // Para POST
-        if (["POST"].includes(req.method) && (value === undefined || value === null || value === "")) {
+        if (
+          ["POST"].includes(req.method) &&
+          (value === undefined || value === null || value === "")
+        ) {
           throw new Error("MustNotBeEmpty");
         }
         // Para POST y PUT

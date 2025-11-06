@@ -127,7 +127,6 @@ const generatePdf = async (data, outputPath) => {
     data.nonReportingUnits.length
   );
 
-
   for (let i = 0; i < maxRows; i++) {
     if (y > doc.page.height - 50) {
       doc.addPage();
@@ -172,7 +171,6 @@ const generatePdf = async (data, outputPath) => {
       doc
         .fontSize(10)
         .text(`- ${unit.nm} (ID: ${unit.id})`, 55 + columnWidth, y + 5);
-
     }
 
     y += rowHeight;
@@ -222,7 +220,7 @@ const getPdfUnits = async (req, res) => {
   };
 
   const outputPath = path.join(__dirname, "units_report.pdf");
-  
+
   try {
     await generatePdf(data, outputPath);
 
@@ -231,7 +229,7 @@ const getPdfUnits = async (req, res) => {
     }
 
     const stats = fs.statSync(outputPath);
-    
+
     res.writeHead(200, {
       "Content-Type": "application/pdf",
       "Content-Disposition": "attachment; filename=\"units_report.pdf\"",
@@ -239,7 +237,7 @@ const getPdfUnits = async (req, res) => {
     });
 
     const fileStream = fs.createReadStream(outputPath);
-    
+
     fileStream.on("error", (error) => {
       console.error("Error reading PDF file:", error);
       if (!res.headersSent) {
@@ -258,7 +256,7 @@ const getPdfUnits = async (req, res) => {
     });
   } catch (error) {
     console.error("Error generating PDF:", error);
-    
+
     if (fs.existsSync(outputPath)) {
       fs.unlink(outputPath, (err) => {
         if (err) {
@@ -266,7 +264,7 @@ const getPdfUnits = async (req, res) => {
         }
       });
     }
-    
+
     throw error;
   }
 };

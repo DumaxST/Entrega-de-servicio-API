@@ -16,6 +16,16 @@
   "UserDeletedSuccessfully": "User deleted successfully",
   "InvalidProperties": "Invalid properties",
   "MustBeAString": "must be a string",
-  "MustNotBeEmpty": "must not be empty"
+  "MustNotBeEmpty": "must not be empty",
+  "statusActive": "Active",
+  "statusInactive": "Inactive",
+  "statusMaintenance": "Maintenance",
+  "totalProducts": "Total Products",
+  "totalRevenue": "Total Revenue",
+  "averagePrice": "Average Price",
+  "totalClients": "Total Clients",
+  "mostExpensive": "Most Expensive",
+  "mostPopular": "Most Popular",
+  "recentActivity": "Recent Activity",
+  "topProducts": "Top Products by Revenue"
 }
-

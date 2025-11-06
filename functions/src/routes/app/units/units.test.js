@@ -63,7 +63,6 @@ describe("GET /units/report", () => {
 
     const res = await request(App).get("/units/report").query({lang: lang});
 
-
     expect(res.status).toBe(404);
     expect(res.body.meta.message).toBe(
       lang === "es"
@@ -77,7 +76,6 @@ describe("GET /units/report", () => {
     fetchAllUnitsWialon.mockResolvedValue(null);
 
     const res = await request(App).get("/units/report").query({lang: lang});
-
 
     expect(res.status).toBe(404);
     expect(res.body.meta.message).toBe(
@@ -93,20 +91,17 @@ describe("GET /units/report", () => {
         id: 1,
         lmsg: {t: 1738773707},
         pos: {t: 1738773707, y: 20.5215616, x: -103.29266, f: 3},
-
       },
       {
         nm: "Unit2",
         id: 2,
         lmsg: {t: 1738773707},
         pos: {t: 1738773707, y: 20.5215616, x: -103.29266, f: 3},
-
       },
     ]);
     isUnitReportingWialon.mockImplementation((unit) => unit.id === 1);
 
     const res = await request(App).get("/units/report").query({lang: lang});
-
 
     expect(res.status).toBe(200);
     expect(res.body.data).toEqual({

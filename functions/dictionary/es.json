@@ -16,6 +16,16 @@
   "UserDeletedSuccessfully": "Usuario eliminado exitosamente",
   "InvalidProperties": "Propiedades inválidas",
   "MustBeAString": "debe ser una cadena de texto",
-  "MustNotBeEmpty": "no debe estar vacío"
+  "MustNotBeEmpty": "no debe estar vacío",
+  "statusActive": "Activo",
+  "statusInactive": "Inactivo",
+  "statusMaintenance": "Mantenimiento",
+  "totalProducts": "Total de Productos",
+  "totalRevenue": "Ingresos Totales",
+  "averagePrice": "Precio Promedio",
+  "totalClients": "Total de Clientes",
+  "mostExpensive": "Más Caro",
+  "mostPopular": "Más Popular",
+  "recentActivity": "Actividad Reciente",
+  "topProducts": "Productos Top por Ingresos"
 }
-
