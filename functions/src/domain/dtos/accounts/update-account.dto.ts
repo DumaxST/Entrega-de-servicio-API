@@ -54,8 +54,7 @@ static create(props: { [key: string]: any }): [string?, UpdateAccountDTO?] {
         companyName?.trim(),
         status,
         contactInfo,
-       // normalizedContact,
-       // FieldValue.serverTimestamp()
+      
       ),
     ];
   }

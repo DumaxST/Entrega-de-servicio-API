@@ -1,4 +1,4 @@
-import { CreateAccountDTO } from "domain/dtos";
+import { CreateAccountDTO , UpdateAccountDTO} from "domain/dtos";
 import { AccountEntity } from "domain/entities/account.entity";
 
 export abstract class AccountRepository {
@@ -7,5 +7,7 @@ export abstract class AccountRepository {
    abstract getAll():Promise<AccountEntity[]>;
 
    abstract getById(id:string):Promise<AccountEntity | null>
-   abstract updateAccount(id:string):Promise<AccountEntity | null>
+   abstract updateAccount(id:string, updateAccountDto: UpdateAccountDTO):Promise<AccountEntity | null>
+   abstract deleteAccount(id:string):Promise<void>;
+   
 }

@@ -1,4 +1,4 @@
-import { AccountDataSource, AccountEntity, AccountRepository, CreateAccountDTO } from "./../../domain";
+import { AccountDataSource, AccountEntity, AccountRepository, CreateAccountDTO, UpdateAccountDTO } from "./../../domain";
 
 export class AccountRepositoryImp implements AccountRepository {
     constructor(
@@ -15,8 +15,11 @@ export class AccountRepositoryImp implements AccountRepository {
     getById(id: string): Promise<AccountEntity | null> {
         return this.dataSource.getById(id);
     }
-    updateAccount(id: string): Promise<AccountEntity | null> {
-        return this.dataSource.updateAccount(id);
+    updateAccount(id: string,dto: UpdateAccountDTO): Promise<AccountEntity | null> {
+        return this.dataSource.updateAccount(id,dto);
+    }
+    deleteAccount(id: string): Promise<void> {
+        return this.dataSource.deleteAccount(id);
     }
 
 
