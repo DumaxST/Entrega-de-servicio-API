@@ -1,6 +1,7 @@
 import { Request, Response, } from "express";
 import { db, FieldValue, Timestamp } from "./../../config/firebaseAdmin";
 import { CreateAccountDTO, UpdateAccountDTO } from "./../../domain/dtos";
+import { AccountDataSourceImp } from "infrastructure/datasource/account.datasource.imp";
 
 
 
@@ -9,26 +10,9 @@ export class AccountController {
     public getAccounts = async (req: Request, res: Response) => {
         try {
 
-            const accountsRef = db.collection('accounts');
 
-            let query = accountsRef
-                .orderBy('companyName', 'desc');
 
-            const snapshot = await query.get();
-
-            const data = snapshot.docs.map(doc => {
-
-                const docData = doc.data();
-                return {
-                    id: doc.id,
-                    email: docData.email,
-                    companyName: docData.companyName,
-                    contactInfo: docData.contactInfo,
-                    createdAt: docData.createdAt,
-                }
-            });
-
-            return res.status(200).json({ data });
+            return res.status(200).json({  });
         } catch (error) {
             if (error instanceof Error) {
                 return res.status(500).json({ message: error.message });
@@ -67,33 +51,10 @@ export class AccountController {
             if (error) {
                 return res.status(400).json({ message: `Error: ${error}` });
             }
-            console.log(createAccountDto)
-            const accountsRef = db.collection('accounts');
-
-            const snapshot = await accountsRef.where('email', '==', createAccountDto!.email)
-                .limit(1)
-                .get();
-
-            if (!snapshot.empty) {
-                throw new Error('EMAIL_EXISTS');
-            }
-            const newDocRef = accountsRef.doc();
-            const newAccountData = {
-                email: createAccountDto!.email,
-                companyName: createAccountDto!.companyName,
-                status: createAccountDto!.status,
-                contactInfo: {
-                    phone: createAccountDto!.contactInfo?.phone || null,
-                    city: createAccountDto!.contactInfo?.city || null,
-                    state: createAccountDto!.contactInfo?.state || null,
-                },
-                createdAt: FieldValue.serverTimestamp(),
-
-            }
-            await newDocRef.set(newAccountData);
+           
             return res.status(201).json({
-                id: newDocRef.id,
-                ...newAccountData,
+                //id: newDocRef.id,
+                //...newAccountData,
                 createdAt: Timestamp.now(),
             });
 
