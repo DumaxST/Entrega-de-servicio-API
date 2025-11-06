@@ -1,4 +1,4 @@
-import { AccountEntity , AccountRepository, CreateAccountDTO} from "./../../domain";
+import { AccountEntity , AccountRepository, CreateAccountDTO} from "../..";
 
 export interface CreateAccountUseCase {
     execute(dto: CreateAccountDTO): Promise<AccountEntity>;

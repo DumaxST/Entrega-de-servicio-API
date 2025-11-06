@@ -12,13 +12,13 @@ export class AccountRepositoryImp implements AccountRepository {
     getAll(): Promise<AccountEntity[]> {
         return this.dataSource.getAll();
     }
-    getById(id: string): Promise<AccountEntity | null> {
+    getById(id: string): Promise<AccountEntity> {
         return this.dataSource.getById(id);
     }
-    updateAccount(id: string,dto: UpdateAccountDTO): Promise<AccountEntity | null> {
+    updateAccount(id: string,dto: UpdateAccountDTO): Promise<AccountEntity> {
         return this.dataSource.updateAccount(id,dto);
     }
-    deleteAccount(id: string): Promise<void> {
+    deleteAccount(id: string): Promise<AccountEntity> {
         return this.dataSource.deleteAccount(id);
     }
 

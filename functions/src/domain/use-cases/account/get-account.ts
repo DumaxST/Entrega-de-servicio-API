@@ -1,4 +1,4 @@
-import { AccountEntity , AccountRepository} from "./../../domain";
+import { AccountEntity , AccountRepository} from "../..";
 
 export interface GetAccountUseCase {
     execute(id:string): Promise<AccountEntity>;

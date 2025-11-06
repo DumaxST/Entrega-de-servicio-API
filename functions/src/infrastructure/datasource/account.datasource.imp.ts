@@ -60,7 +60,7 @@ export class AccountDataSourceImp implements AccountDataSource {
         });
     }
 
-    async getById(id: string): Promise<AccountEntity | null> {
+    async getById(id: string): Promise<AccountEntity> {
         // Implementación específica para obtener una cuenta por ID
         const docRef = db.collection('accounts').doc(id);
 
@@ -77,13 +77,23 @@ export class AccountDataSourceImp implements AccountDataSource {
     }
 
 
-    async deleteAccount(id: string) {
+    async deleteAccount(id: string): Promise<AccountEntity> {
         const docRef = db.collection('accounts').doc(id);
+        const doc = await docRef.get();
+
+        if (!doc.exists) {
+            throw new Error('La cuenta no existe.');
+        }
+
         await docRef.delete();
-        
+
+        return AccountEntity.fromObject({
+            id: doc.id,
+            ...doc.data()
+        });
     }
 
-    async updateAccount(id: string, updateAccountDto?: UpdateAccountDTO): Promise<AccountEntity | null> {
+    async updateAccount(id: string, updateAccountDto?: UpdateAccountDTO): Promise<AccountEntity> {
         const docRef = db.collection('accounts').doc(id);
         const doc = await docRef.get();
 
