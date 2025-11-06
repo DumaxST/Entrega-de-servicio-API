@@ -1,4 +1,4 @@
-type AccountStatus = "active" | "inactive" | "suspended";
+export type AccountStatus = "active" | "inactive" | "suspended";
 export interface ContactInfoDTO {
     phone?: string | null;
     city?: string | null;
@@ -14,5 +14,4 @@ export declare class CreateAccountDTO {
         [key: string]: any;
     }): [string?, CreateAccountDTO?];
 }
-export {};
 //# sourceMappingURL=create-account.dto.d.ts.map

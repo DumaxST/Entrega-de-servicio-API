@@ -1,5 +1,5 @@
 
-type AccountStatus = "active" | "inactive" | "suspended";
+export type AccountStatus = "active" | "inactive" | "suspended";
 
 
 export interface ContactInfoDTO {
@@ -13,21 +13,25 @@ export class CreateAccountDTO {
         public readonly companyName: string,
         public readonly status: AccountStatus = "active",
         public readonly contactInfo?: ContactInfoDTO
-
     ) { }
 
     static create(props: { [key: string]: any }): [string?, CreateAccountDTO?] {
         const { email, companyName, status, contactInfo } = props;
 
-        if (typeof email !== "string" || email.trim() === "") {
-            return ["Email es requerido", undefined];
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            return ["Email format es inválido", undefined];
+        if (!email) return ['El email es requerido.', undefined];
+        if (!companyName) return ['El nombre de la compañía es requerido.', undefined];
+
+        if (!/^\S+@\S+\.\S+$/.test(email)) {
+            return ['El formato del email es inválido.', undefined];
         }
 
-        if (typeof companyName !== "string" || companyName.trim() === "") {
-            return ["Company Name es requerido", undefined];
+        const validStatuses: AccountStatus[] = ["active", "inactive", "suspended"];
+        if (!validStatuses.includes(status)) {
+            return [`Estado inválido. Debe ser uno de: ${validStatuses.join(', ')}`, undefined];
+        }
+
+        if (contactInfo && (typeof contactInfo !== 'object' || Array.isArray(contactInfo))) {
+            return ['La información de contacto debe ser un objeto.', undefined];
         }
         const normalizedStatus: AccountStatus = status === "inactive" ? "inactive" : "active";
         let normalizedContact: ContactInfoDTO | undefined = undefined;
