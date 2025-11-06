@@ -44,6 +44,9 @@ bower_components
 # Compiled binary addons (http://nodejs.org/api/addons.html)
 build/Release
 
+# TypeScript compiled output
+lib/
+
 # Dependency directories
 node_modules/
 
@@ -71,3 +74,6 @@ serviceAccount.json
 
 # dataconnect generated files
 .dataconnect
+
+
+keys/
