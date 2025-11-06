@@ -1,0 +1,23 @@
+# Compiled output
+lib/
+*.d.ts
+
+# Dependencies
+node_modules/
+
+# Firebase
+.firebase/
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Test coverage
+coverage/
+
+# Logs
+*.log

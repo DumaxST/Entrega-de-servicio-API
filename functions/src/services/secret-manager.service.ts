@@ -1,4 +1,4 @@
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import { SecretManagerServiceClient } from "@google-cloud/secret-manager";
 
 export class SecretManagerService {
     private client: SecretManagerServiceClient;
@@ -6,16 +6,16 @@ export class SecretManagerService {
 
     constructor(projectId?: string) {
         this.client = new SecretManagerServiceClient();
-        this.projectId = projectId || process.env.GCLOUD_PROJECT || 'service-delivery-development';
+        this.projectId = projectId || process.env.GCLOUD_PROJECT || "service-delivery-development";
     }
 
     /**
      * Retrieves a secret value from Google Secret Manager
      * @param secretName - The name of the secret (e.g., "WIALON_API_TOKEN")
      * @param version - The version of the secret (default: "latest")
-     * @returns The secret value as a string
+     * @return The secret value as a string
      */
-    async getSecret(secretName: string, version: string = 'latest'): Promise<string> {
+    async getSecret(secretName: string, version: string = "latest"): Promise<string> {
         try {
             const name = `projects/${this.projectId}/secrets/${secretName}/versions/${version}`;
 
@@ -45,7 +45,7 @@ export class SecretManagerService {
      * Creates a new secret in Google Secret Manager
      * @param secretName - The name of the secret
      * @param secretValue - The value to store
-     * @returns The created secret name
+     * @return The created secret name
      */
     async createSecret(secretName: string, secretValue: string): Promise<string> {
         try {
@@ -66,7 +66,7 @@ export class SecretManagerService {
             await this.client.addSecretVersion({
                 parent: secret.name,
                 payload: {
-                    data: Buffer.from(secretValue, 'utf8'),
+                    data: Buffer.from(secretValue, "utf8"),
                 },
             });
 
@@ -86,7 +86,7 @@ export class SecretManagerService {
      * Updates a secret by adding a new version
      * @param secretName - The name of the secret
      * @param secretValue - The new value to store
-     * @returns The version name of the new secret version
+     * @return The version name of the new secret version
      */
     async updateSecret(secretName: string, secretValue: string): Promise<string> {
         try {
@@ -95,11 +95,11 @@ export class SecretManagerService {
             const [version] = await this.client.addSecretVersion({
                 parent: parent,
                 payload: {
-                    data: Buffer.from(secretValue, 'utf8'),
+                    data: Buffer.from(secretValue, "utf8"),
                 },
             });
 
-            return version.name || '';
+            return version.name || "";
         } catch (error: any) {
             if (error.code === 5) { // NOT_FOUND error code
                 throw new Error(`El secreto ${secretName} no existe. Usa createSecret para crearlo primero.`);
@@ -135,7 +135,7 @@ export class SecretManagerService {
 
     /**
      * Lists all secrets in the project
-     * @returns Array of secret names
+     * @return Array of secret names
      */
     async listSecrets(): Promise<string[]> {
         try {
@@ -145,9 +145,9 @@ export class SecretManagerService {
             });
 
             return secrets.map(secret => {
-                const parts = secret.name?.split('/');
-                return parts?.[parts.length - 1] || '';
-            }).filter(name => name !== '');
+                const parts = secret.name?.split("/");
+                return parts?.[parts.length - 1] || "";
+            }).filter(name => name !== "");
         } catch (error: any) {
             if (error.code === 7) { // PERMISSION_DENIED error code
                 throw new Error(`No tienes permisos para listar secretos en Secret Manager.`);

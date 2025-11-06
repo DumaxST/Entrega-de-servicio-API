@@ -12,30 +12,30 @@ export class SystemConfigEntity {
         if (percentage >= this.serviceThresholds.excellent) {
             return "excellent";
         }
-        if (percentage >= this.serviceThresholds.good_range[0] &&
-            percentage <= this.serviceThresholds.good_range[1]) {
+        if (percentage >= this.serviceThresholds.goodRange[0] &&
+            percentage <= this.serviceThresholds.goodRange[1]) {
             return "good";
         }
-        if (percentage >= this.serviceThresholds.regular_range[0] &&
-            percentage <= this.serviceThresholds.regular_range[1]) {
+        if (percentage >= this.serviceThresholds.regularRange[0] &&
+            percentage <= this.serviceThresholds.regularRange[1]) {
             return "regular";
         }
-        if (percentage >= this.serviceThresholds.bad_range[0] &&
-            percentage <= this.serviceThresholds.bad_range[1]) {
+        if (percentage >= this.serviceThresholds.badRange[0] &&
+            percentage <= this.serviceThresholds.badRange[1]) {
             return "bad";
         }
         return "critical";
     }
 
     public validateThresholds(): boolean {
-        const { excellent, good_range, regular_range, bad_range, critical_range } = this.serviceThresholds;
+        const { excellent, goodRange, regularRange, badRange, criticalRange } = this.serviceThresholds;
 
         // Validate ranges are properly ordered
-        if (excellent < good_range[1]) return false;
-        if (good_range[0] > good_range[1]) return false;
-        if (regular_range[0] > regular_range[1]) return false;
-        if (bad_range[0] > bad_range[1]) return false;
-        if (critical_range[0] > critical_range[1]) return false;
+        if (excellent < goodRange[1]) return false;
+        if (goodRange[0] > goodRange[1]) return false;
+        if (regularRange[0] > regularRange[1]) return false;
+        if (badRange[0] > badRange[1]) return false;
+        if (criticalRange[0] > criticalRange[1]) return false;
 
         return true;
     }
@@ -49,7 +49,7 @@ export class SystemConfigEntity {
         // Replace additional placeholders
         Object.keys(additionalData).forEach(key => {
             const placeholder = `[${key}]`;
-            template = template.replace(new RegExp(placeholder, 'g'), additionalData[key]);
+            template = template.replace(new RegExp(placeholder, "g"), additionalData[key]);
         });
 
         return template;
@@ -72,22 +72,22 @@ export class SystemConfigEntity {
             throw new Error("SystemConfig Entity: serviceThresholds debe ser un objeto");
         }
 
-        const { excellent, good_range, regular_range, bad_range, critical_range } = serviceThresholds;
+        const { excellent, goodRange, regularRange, badRange, criticalRange } = serviceThresholds;
 
         if (typeof excellent !== "number") {
             throw new Error("SystemConfig Entity: excellent debe ser un número");
         }
-        if (!Array.isArray(good_range) || good_range.length !== 2) {
-            throw new Error("SystemConfig Entity: good_range debe ser un array de 2 números");
+        if (!Array.isArray(goodRange) || goodRange.length !== 2) {
+            throw new Error("SystemConfig Entity: goodRange debe ser un array de 2 números");
         }
-        if (!Array.isArray(regular_range) || regular_range.length !== 2) {
-            throw new Error("SystemConfig Entity: regular_range debe ser un array de 2 números");
+        if (!Array.isArray(regularRange) || regularRange.length !== 2) {
+            throw new Error("SystemConfig Entity: regularRange debe ser un array de 2 números");
         }
-        if (!Array.isArray(bad_range) || bad_range.length !== 2) {
-            throw new Error("SystemConfig Entity: bad_range debe ser un array de 2 números");
+        if (!Array.isArray(badRange) || badRange.length !== 2) {
+            throw new Error("SystemConfig Entity: badRange debe ser un array de 2 números");
         }
-        if (!Array.isArray(critical_range) || critical_range.length !== 2) {
-            throw new Error("SystemConfig Entity: critical_range debe ser un array de 2 números");
+        if (!Array.isArray(criticalRange) || criticalRange.length !== 2) {
+            throw new Error("SystemConfig Entity: criticalRange debe ser un array de 2 números");
         }
 
         // Validate notificationTemplate
@@ -108,10 +108,10 @@ export class SystemConfigEntity {
         const entity = new SystemConfigEntity(
             {
                 excellent,
-                good_range: [good_range[0], good_range[1]],
-                regular_range: [regular_range[0], regular_range[1]],
-                bad_range: [bad_range[0], bad_range[1]],
-                critical_range: [critical_range[0], critical_range[1]]
+                goodRange: [goodRange[0], goodRange[1]],
+                regularRange: [regularRange[0], regularRange[1]],
+                badRange: [badRange[0], badRange[1]],
+                criticalRange: [criticalRange[0], criticalRange[1]]
             },
             notificationTemplate.trim(),
             parsedUpdatedAt

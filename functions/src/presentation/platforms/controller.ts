@@ -28,7 +28,7 @@ export class PlatformController {
     public getPlatformById = (req: Request, res: Response) => {
         const { id } = req.params;
         if (!id) {
-            return res.status(400).json({ message: 'Error: Se requiere el ID de la plataforma.' });
+            return res.status(400).json({ message: "Error: Se requiere el ID de la plataforma." });
         }
 
         return new GetPlatform(this.platformRepository)
@@ -79,7 +79,7 @@ export class PlatformController {
     public deletePlatform = (req: Request, res: Response) => {
         const { id } = req.params;
         if (!id) {
-            return res.status(400).json({ message: 'Error: Se requiere el ID de la plataforma.' });
+            return res.status(400).json({ message: "Error: Se requiere el ID de la plataforma." });
         }
 
         return new DeletePlatform(this.platformRepository)

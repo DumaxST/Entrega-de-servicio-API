@@ -5,21 +5,21 @@ import { AccountEntity } from "../../domain/entities/account.entity";
 
 export class AccountDataSourceImp implements AccountDataSource {
 
-    public collectionPath: string = 'accounts';
+    public collectionPath: string = "accounts";
     constructor(collectionPath: string) {
         this.collectionPath = collectionPath;
 
     }
 
     async createAccount(createAccountDto: CreateAccountDTO): Promise<AccountEntity> {
-        const accountsRef = db.collection('accounts');
+        const accountsRef = db.collection("accounts");
 
         // Verificar que el clientCode sea único
-        const snapshot = await accountsRef.where('clientCode', '==', createAccountDto!.clientCode)
+        const snapshot = await accountsRef.where("clientCode", "==", createAccountDto!.clientCode)
             .limit(1)
             .get();
         if (!snapshot.empty) {
-            throw new Error('El código de cliente ya está registrado.');
+            throw new Error("El código de cliente ya está registrado.");
         }
         const newDocRef = accountsRef.doc();
 
@@ -58,9 +58,9 @@ export class AccountDataSourceImp implements AccountDataSource {
 
     async getAll(): Promise<AccountEntity[]> {
 
-        const accountsRef = db.collection('accounts');
-        let query = accountsRef
-            .orderBy('companyName', 'desc');
+        const accountsRef = db.collection("accounts");
+        const query = accountsRef
+            .orderBy("companyName", "desc");
 
         const snapshot = await query.get();
 
@@ -76,12 +76,12 @@ export class AccountDataSourceImp implements AccountDataSource {
 
     async getById(id: string): Promise<AccountEntity> {
         // Implementación específica para obtener una cuenta por ID
-        const docRef = db.collection('accounts').doc(id);
+        const docRef = db.collection("accounts").doc(id);
 
         const doc = await docRef.get();
 
         if (!doc.exists) {
-            throw new Error('La cuenta no existe.');
+            throw new Error("La cuenta no existe.");
         }
 
         return AccountEntity.fromObject({
@@ -92,11 +92,11 @@ export class AccountDataSourceImp implements AccountDataSource {
 
 
     async deleteAccount(id: string): Promise<AccountEntity> {
-        const docRef = db.collection('accounts').doc(id);
+        const docRef = db.collection("accounts").doc(id);
         const doc = await docRef.get();
 
         if (!doc.exists) {
-            throw new Error('La cuenta no existe.');
+            throw new Error("La cuenta no existe.");
         }
 
         await docRef.delete();
@@ -108,11 +108,11 @@ export class AccountDataSourceImp implements AccountDataSource {
     }
 
     async updateAccount(id: string, updateAccountDto?: UpdateAccountDTO): Promise<AccountEntity> {
-        const docRef = db.collection('accounts').doc(id);
+        const docRef = db.collection("accounts").doc(id);
         const doc = await docRef.get();
 
         if (!doc.exists) {
-            throw new Error('La cuenta no existe.');
+            throw new Error("La cuenta no existe.");
         }
 
         const dataToUpdate = updateAccountDto!.values;

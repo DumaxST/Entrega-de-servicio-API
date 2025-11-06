@@ -40,75 +40,75 @@ export class CreateAccountDTO {
         const { clientCode, companyName, status, contactInfo, accountManagerId, stats } = props;
 
         // Validación de clientCode (requerido)
-        if (!clientCode) return ['El código de cliente es requerido.', undefined];
-        if (typeof clientCode !== 'string') return ['El código de cliente debe ser un string.', undefined];
+        if (!clientCode) return ["El código de cliente es requerido.", undefined];
+        if (typeof clientCode !== "string") return ["El código de cliente debe ser un string.", undefined];
 
         const normalizedClientCode = clientCode.trim().toUpperCase();
         if (!CLIENT_CODE_REGEX.test(normalizedClientCode)) {
-            return ['El código de cliente debe tener entre 3-20 caracteres (letras mayúsculas, números, guiones y guiones bajos).', undefined];
+            return ["El código de cliente debe tener entre 3-20 caracteres (letras mayúsculas, números, guiones y guiones bajos).", undefined];
         }
 
         // Validación de companyName (requerido)
-        if (!companyName) return ['El nombre de la compañía es requerido.', undefined];
-        if (typeof companyName !== 'string') return ['El nombre de la compañía debe ser un string.', undefined];
+        if (!companyName) return ["El nombre de la compañía es requerido.", undefined];
+        if (typeof companyName !== "string") return ["El nombre de la compañía debe ser un string.", undefined];
 
         // Validación de status (opcional, por defecto "active")
         const validStatuses: AccountStatus[] = ["active", "inactive", "suspended"];
         const normalizedStatus: AccountStatus = status && validStatuses.includes(status) ? status : "active";
 
         // Validación de contactInfo (requerido)
-        if (!contactInfo) return ['La información de contacto es requerida.', undefined];
-        if (typeof contactInfo !== 'object' || Array.isArray(contactInfo)) {
-            return ['La información de contacto debe ser un objeto.', undefined];
+        if (!contactInfo) return ["La información de contacto es requerida.", undefined];
+        if (typeof contactInfo !== "object" || Array.isArray(contactInfo)) {
+            return ["La información de contacto debe ser un objeto.", undefined];
         }
 
         // Validación de phones
         const { phones, city, state, notificationEmails } = contactInfo;
         if (!phones || !Array.isArray(phones) || phones.length === 0) {
-            return ['Se requiere al menos un teléfono en el array de phones.', undefined];
+            return ["Se requiere al menos un teléfono en el array de phones.", undefined];
         }
         for (const phone of phones) {
-            if (typeof phone !== 'string' || !PHONE_REGEX.test(phone.trim())) {
-                return ['Todos los teléfonos deben tener 10 dígitos numéricos.', undefined];
+            if (typeof phone !== "string" || !PHONE_REGEX.test(phone.trim())) {
+                return ["Todos los teléfonos deben tener 10 dígitos numéricos.", undefined];
             }
         }
 
         // Validación de notificationEmails
         if (!notificationEmails || !Array.isArray(notificationEmails) || notificationEmails.length === 0) {
-            return ['Se requiere al menos un email en el array de notificationEmails.', undefined];
+            return ["Se requiere al menos un email en el array de notificationEmails.", undefined];
         }
         for (const email of notificationEmails) {
-            if (typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
-                return ['Todos los emails de notificación deben tener un formato válido.', undefined];
+            if (typeof email !== "string" || !EMAIL_REGEX.test(email.trim())) {
+                return ["Todos los emails de notificación deben tener un formato válido.", undefined];
             }
         }
 
         // Validación de accountManagerId (opcional)
         if (accountManagerId !== undefined && accountManagerId !== null) {
-            if (typeof accountManagerId !== 'string') {
-                return ['El accountManagerId debe ser un string.', undefined];
+            if (typeof accountManagerId !== "string") {
+                return ["El accountManagerId debe ser un string.", undefined];
             }
             if (!FIREBASE_UID_REGEX.test(accountManagerId.trim())) {
-                return ['El formato del accountManagerId es inválido (debe ser un Firebase UID).', undefined];
+                return ["El formato del accountManagerId es inválido (debe ser un Firebase UID).", undefined];
             }
         }
 
         // Validación de stats (opcional, con valores por defecto)
         let normalizedStats: StatsDTO;
-        if (stats && typeof stats === 'object') {
+        if (stats && typeof stats === "object") {
             const validStatsStatuses: StatsStatus[] = ["excelente", "bueno", "regular", "pobre", "critico"];
             if (!validStatsStatuses.includes(stats.status)) {
-                return [`Estado de stats inválido. Debe ser uno de: ${validStatsStatuses.join(', ')}`, undefined];
+                return [`Estado de stats inválido. Debe ser uno de: ${validStatsStatuses.join(", ")}`, undefined];
             }
 
             // Validar que todos los números sean >= 0
             const numericFields = [
-                'totalUnits', 'reportingUnits', 'nonReportingUnits',
-                'deliveryPercentage', 'instalacionesPendientes',
-                'renovacionesPendientes', 'reubicacionesPendientes', 'ticketsEscalados'
+                "totalUnits", "reportingUnits", "nonReportingUnits",
+                "deliveryPercentage", "instalacionesPendientes",
+                "renovacionesPendientes", "reubicacionesPendientes", "ticketsEscalados"
             ];
             for (const field of numericFields) {
-                if (stats[field] !== undefined && (typeof stats[field] !== 'number' || stats[field] < 0)) {
+                if (stats[field] !== undefined && (typeof stats[field] !== "number" || stats[field] < 0)) {
                     return [`El campo ${field} debe ser un número mayor o igual a 0.`, undefined];
                 }
             }

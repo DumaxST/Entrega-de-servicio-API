@@ -16,7 +16,7 @@ export interface QueryFilter {
 export interface PaginationOptions {
     limit: number;
     orderBy: string;
-    orderDir: 'asc' | 'desc';
+    orderDir: "asc" | "desc";
     cursor?: string; // El ID del último documento
 }
 /** Filtro where individual: ["status", "==", "active"] */
@@ -51,7 +51,7 @@ export class FirebaseService<T extends { id: string }> {
     /**
      * Crea un nuevo documento.
      */
-    async create(data: Omit<T, 'id' | 'createdAt' | 'updatedAt'>, id?: string): Promise<T> {
+    async create(data: Omit<T, "id" | "createdAt" | "updatedAt">, id?: string): Promise<T> {
         const dataWithTimestamps = {
             ...data,
             createdAt: FieldValue.serverTimestamp(), 

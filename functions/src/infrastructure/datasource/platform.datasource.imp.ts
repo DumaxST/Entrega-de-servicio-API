@@ -4,7 +4,7 @@ import { CreatePlatformDTO, UpdatePlatformDTO } from "../../domain/dtos/platform
 import { PlatformEntity } from "../../domain/entities/platform.entity";
 
 export class PlatformDataSourceImp implements PlatformDataSource {
-    public collectionPath: string = 'platforms';
+    public collectionPath: string = "platforms";
 
     constructor(collectionPath: string) {
         this.collectionPath = collectionPath;
@@ -15,12 +15,12 @@ export class PlatformDataSourceImp implements PlatformDataSource {
 
         // Check if platform name is unique
         const snapshot = await platformsRef
-            .where('name', '==', createPlatformDto.name)
+            .where("name", "==", createPlatformDto.name)
             .limit(1)
             .get();
 
         if (!snapshot.empty) {
-            throw new Error('Ya existe una plataforma con este nombre.');
+            throw new Error("Ya existe una plataforma con este nombre.");
         }
 
         const newDocRef = platformsRef.doc();
@@ -42,7 +42,7 @@ export class PlatformDataSourceImp implements PlatformDataSource {
 
     async getAll(): Promise<PlatformEntity[]> {
         const platformsRef = db.collection(this.collectionPath);
-        const query = platformsRef.orderBy('name', 'asc');
+        const query = platformsRef.orderBy("name", "asc");
 
         const snapshot = await query.get();
 
@@ -59,7 +59,7 @@ export class PlatformDataSourceImp implements PlatformDataSource {
         const doc = await docRef.get();
 
         if (!doc.exists) {
-            throw new Error('La plataforma no existe.');
+            throw new Error("La plataforma no existe.");
         }
 
         return PlatformEntity.fromObject({
@@ -71,7 +71,7 @@ export class PlatformDataSourceImp implements PlatformDataSource {
     async getByName(name: string): Promise<PlatformEntity | null> {
         const platformsRef = db.collection(this.collectionPath);
         const snapshot = await platformsRef
-            .where('name', '==', name)
+            .where("name", "==", name)
             .limit(1)
             .get();
 
@@ -91,18 +91,18 @@ export class PlatformDataSourceImp implements PlatformDataSource {
         const doc = await docRef.get();
 
         if (!doc.exists) {
-            throw new Error('La plataforma no existe.');
+            throw new Error("La plataforma no existe.");
         }
 
         // If updating name, check uniqueness
         if (updatePlatformDto.name) {
             const snapshot = await db.collection(this.collectionPath)
-                .where('name', '==', updatePlatformDto.name)
+                .where("name", "==", updatePlatformDto.name)
                 .limit(1)
                 .get();
 
             if (!snapshot.empty && snapshot.docs[0].id !== id) {
-                throw new Error('Ya existe otra plataforma con este nombre.');
+                throw new Error("Ya existe otra plataforma con este nombre.");
             }
         }
 
@@ -123,7 +123,7 @@ export class PlatformDataSourceImp implements PlatformDataSource {
         const doc = await docRef.get();
 
         if (!doc.exists) {
-            throw new Error('La plataforma no existe.');
+            throw new Error("La plataforma no existe.");
         }
 
         const platformData = PlatformEntity.fromObject({

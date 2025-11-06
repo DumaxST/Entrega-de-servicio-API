@@ -16,6 +16,8 @@ module.exports = {
     "no-unused-vars": "warn",
     "require-jsdoc": "off",
     "no-unsafe-optional-chaining": "warn",
+    "valid-jsdoc": "off",
+    camelcase: "error",
   },
   overrides: [
     {
@@ -35,7 +37,7 @@ module.exports = {
       },
       extends: [
         "eslint:recommended",
-        "@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended",
         "google",
         "prettier",
       ],
@@ -51,6 +53,9 @@ module.exports = {
         "no-unsafe-optional-chaining": "warn",
         "@typescript-eslint/explicit-function-return-type": "off",
         "@typescript-eslint/no-explicit-any": "warn",
+        "valid-jsdoc": "off",
+        camelcase: "error",
+        "@typescript-eslint/no-require-imports": "off",
       },
     },
   ],
