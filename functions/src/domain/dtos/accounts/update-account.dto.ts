@@ -27,12 +27,12 @@ static create(props: { [key: string]: any }): [string?, UpdateAccountDTO?] {
 
     // Validación de id (requerido)
     if (typeof id !== "string" || id.trim() === "") {
-        return ['ID de la cuenta es requerido.', undefined];
+        return ["ID de la cuenta es requerido.", undefined];
     }
     const normalizedId = id.trim();
 
     if (!FIREBASE_UID_REGEX.test(normalizedId)) {
-        return ['ID de la cuenta inválido.', undefined];
+        return ["ID de la cuenta inválido.", undefined];
     }
 
     // Verificar que haya al menos un campo para actualizar (excluyendo id)
@@ -40,23 +40,23 @@ static create(props: { [key: string]: any }): [string?, UpdateAccountDTO?] {
     delete updateFields.id;
 
     if (Object.keys(updateFields).length === 0) {
-        return ['El cuerpo de la solicitud debe contener al menos un campo para actualizar.', undefined];
+        return ["El cuerpo de la solicitud debe contener al menos un campo para actualizar.", undefined];
     }
 
     // Prevenir actualización de campos inmutables
     if (clientCode !== undefined) {
-        return ['El campo clientCode es inmutable y no puede ser actualizado.', undefined];
+        return ["El campo clientCode es inmutable y no puede ser actualizado.", undefined];
     }
 
     // Prevenir actualización de stats (solo Cloud Functions pueden actualizarlo)
     if (stats !== undefined) {
-        return ['El campo stats es de solo lectura y no puede ser actualizado directamente.', undefined];
+        return ["El campo stats es de solo lectura y no puede ser actualizado directamente.", undefined];
     }
 
     // Validación de companyName (opcional)
     if (companyName !== undefined) {
-        if (typeof companyName !== 'string' || companyName.trim() === '') {
-            return ['El nombre de la compañía debe ser un string no vacío.', undefined];
+        if (typeof companyName !== "string" || companyName.trim() === "") {
+            return ["El nombre de la compañía debe ser un string no vacío.", undefined];
         }
     }
 
@@ -64,15 +64,15 @@ static create(props: { [key: string]: any }): [string?, UpdateAccountDTO?] {
     if (status !== undefined) {
         const validStatuses: AccountStatus[] = ["active", "inactive", "suspended"];
         if (!validStatuses.includes(status)) {
-            return [`Estado inválido. Debe ser uno de: ${validStatuses.join(', ')}`, undefined];
+            return [`Estado inválido. Debe ser uno de: ${validStatuses.join(", ")}`, undefined];
         }
     }
 
     // Validación de contactInfo (opcional)
     let normalizedContactInfo: ContactInfoDTO | undefined;
     if (contactInfo !== undefined) {
-        if (typeof contactInfo !== 'object' || Array.isArray(contactInfo)) {
-            return ['La información de contacto debe ser un objeto.', undefined];
+        if (typeof contactInfo !== "object" || Array.isArray(contactInfo)) {
+            return ["La información de contacto debe ser un objeto.", undefined];
         }
 
         const { phones, city, state, notificationEmails } = contactInfo;
@@ -80,11 +80,11 @@ static create(props: { [key: string]: any }): [string?, UpdateAccountDTO?] {
         // Validación de phones
         if (phones !== undefined) {
             if (!Array.isArray(phones) || phones.length === 0) {
-                return ['Se requiere al menos un teléfono en el array de phones.', undefined];
+                return ["Se requiere al menos un teléfono en el array de phones.", undefined];
             }
             for (const phone of phones) {
-                if (typeof phone !== 'string' || !PHONE_REGEX.test(phone.trim())) {
-                    return ['Todos los teléfonos deben tener 10 dígitos numéricos.', undefined];
+                if (typeof phone !== "string" || !PHONE_REGEX.test(phone.trim())) {
+                    return ["Todos los teléfonos deben tener 10 dígitos numéricos.", undefined];
                 }
             }
         }
@@ -92,11 +92,11 @@ static create(props: { [key: string]: any }): [string?, UpdateAccountDTO?] {
         // Validación de notificationEmails
         if (notificationEmails !== undefined) {
             if (!Array.isArray(notificationEmails) || notificationEmails.length === 0) {
-                return ['Se requiere al menos un email en el array de notificationEmails.', undefined];
+                return ["Se requiere al menos un email en el array de notificationEmails.", undefined];
             }
             for (const email of notificationEmails) {
-                if (typeof email !== 'string' || !EMAIL_REGEX.test(email.trim())) {
-                    return ['Todos los emails de notificación deben tener un formato válido.', undefined];
+                if (typeof email !== "string" || !EMAIL_REGEX.test(email.trim())) {
+                    return ["Todos los emails de notificación deben tener un formato válido.", undefined];
                 }
             }
         }
@@ -114,14 +114,14 @@ static create(props: { [key: string]: any }): [string?, UpdateAccountDTO?] {
     if (accountManagerId !== undefined) {
         if (accountManagerId === null) {
             normalizedAccountManagerId = null;
-        } else if (typeof accountManagerId === 'string') {
+        } else if (typeof accountManagerId === "string") {
             const trimmedManagerId = accountManagerId.trim();
             if (!FIREBASE_UID_REGEX.test(trimmedManagerId)) {
-                return ['El formato del accountManagerId es inválido (debe ser un Firebase UID).', undefined];
+                return ["El formato del accountManagerId es inválido (debe ser un Firebase UID).", undefined];
             }
             normalizedAccountManagerId = trimmedManagerId;
         } else {
-            return ['El accountManagerId debe ser un string o null.', undefined];
+            return ["El accountManagerId debe ser un string o null.", undefined];
         }
     }
 

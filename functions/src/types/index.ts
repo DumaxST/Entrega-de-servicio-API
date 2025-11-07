@@ -39,7 +39,7 @@ export interface Device {
   name: string;
   type: string;
   accountId: string;
-  status: 'active' | 'inactive' | 'maintenance';
+  status: "active" | "inactive" | "maintenance";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,8 +48,8 @@ export interface ServiceTicket {
   id: string;
   title: string;
   description: string;
-  status: 'open' | 'in_progress' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  status: "open" | "in_progress" | "closed";
+  priority: "low" | "medium" | "high" | "critical";
   accountId: string;
   assignedTo?: string;
   createdAt: Date;

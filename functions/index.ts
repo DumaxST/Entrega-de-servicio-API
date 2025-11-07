@@ -1,13 +1,13 @@
-// Dependencias Firebase
 import * as functions from "firebase-functions";
 // import * as admin from "firebase-admin";
 // Express
-import express from 'express';
+import express from "express";
 import compression from "compression";
+import cors from "cors";
 // cors 
 // import  cors from "cors";
 
-//Firebase admin init
+// Firebase admin init
 import "./src/config/firebaseAdmin";
 
 // routes
@@ -46,12 +46,13 @@ import { AppRoutes } from "./src/presentation/routes";
 //   process.env.ORIGIN2 || "http://localhost:5173"
 // ].filter(Boolean);
 
-//Crea la app de express 
+// Crea la app de express 
 const app = express();
 // Aplica los middlewares
-//app.use(cors({ origin: true }));
+// app.use(cors({ origin: true }));
 app.use(express.json());
 app.use(compression());
+app.use(cors({ origin: true }));
 // Configura las rutas
 app.use(AppRoutes.routes);
 // Exporta la app como una función de Firebase

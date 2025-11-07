@@ -1,6 +1,6 @@
 import { Request, Response, } from "express";
 import { CreateAccountDTO, UpdateAccountDTO } from "./../../domain/dtos";
-import { AccountRepository } from '../../domain/repositories/account.repository';
+import { AccountRepository } from "../../domain/repositories/account.repository";
 import { GetAccounts, GetAccount, CreateAccount, UpdateAccount, DeleteAccount } from "../../domain/use-cases";
 
 export class AccountController {
@@ -24,7 +24,7 @@ export class AccountController {
     public getAccountById = (req: Request, res: Response) => {
         const { id } = req.params;
         if (!id) {
-            return res.status(400).json({ message: 'Error: Se requiere el ID de la cuenta.' });
+            return res.status(400).json({ message: "Error: Se requiere el ID de la cuenta." });
         }
 
         return new GetAccount(this.accountRepository)
@@ -76,7 +76,7 @@ export class AccountController {
     public deleteAccount = (req: Request, res: Response) => {
         const { id } = req.params;
         if (!id) {
-            return res.status(400).json({ message: 'Error: Se requiere el ID de la cuenta.' });
+            return res.status(400).json({ message: "Error: Se requiere el ID de la cuenta." });
         }
         return new DeleteAccount(this.accountRepository)
             .execute(id)
