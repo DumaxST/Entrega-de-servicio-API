@@ -7,6 +7,20 @@ export interface ContactInfo {
     notificationEmails: string[];
 }
 
+export interface DeviceStatusBreakdown {
+    reporting: number;
+    not_reporting: number;
+    maintenance: number;
+    inactive: number;
+}
+
+export interface DeviceStatusPercentages {
+    reporting: number;
+    not_reporting: number;
+    maintenance: number;
+    inactive: number;
+}
+
 export interface Stats {
     totalUnits: number;
     reportingUnits: number;
@@ -17,6 +31,8 @@ export interface Stats {
     renovacionesPendientes: number;
     reubicacionesPendientes: number;
     ticketsEscalados: number;
+    deviceStatusBreakdown?: DeviceStatusBreakdown;
+    deviceStatusPercentages?: DeviceStatusPercentages;
 }
 
 export class AccountEntity {

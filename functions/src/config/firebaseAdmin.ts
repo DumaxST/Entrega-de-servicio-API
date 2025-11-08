@@ -13,11 +13,8 @@ if (isEmulator) {
 
   console.log("Firebase Admin initialized for EMULATOR mode");
 } else {
-  // Initialize with service account for production
-  const serviceAccount = require("./../serviceAccount.json");
-
+  // Initialize for production (Firebase automatically provides credentials)
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
     storageBucket: envs.fbStorageBucket || "gs://service-delivery-development.firebasestorage.app",
   });
 
