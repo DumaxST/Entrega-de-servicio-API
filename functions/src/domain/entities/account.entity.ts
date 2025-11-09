@@ -35,6 +35,25 @@ export interface Stats {
     deviceStatusPercentages?: DeviceStatusPercentages;
 }
 
+/**
+ * Estadísticas mensuales de servicios completados
+ * Contadores que se incrementan cuando un ticket se completa
+ */
+export interface MonthlyStats {
+    instalacionesCompletadas: number;
+    renovacionesCompletadas: number;
+    reubicacionesCompletadas: number;
+    ticketsSoporteCerrados: number;
+}
+
+/**
+ * Historial de estadísticas por mes
+ * La clave es el formato "YYYY_MM" (ej: "2024_11" para noviembre 2024)
+ */
+export interface HistoricalStats {
+    [monthKey: string]: MonthlyStats;
+}
+
 export class AccountEntity {
     constructor(
         public readonly id: string,
@@ -44,11 +63,12 @@ export class AccountEntity {
         public contactInfo: ContactInfo,
         public accountManagerId: string | null,
         public stats: Stats,
+        public historicalStats?: HistoricalStats,
         public createdAt?: Date,
         public updatedAt?: Date
     ) { }
     public static fromObject(object: { [key: string]: any }): AccountEntity {
-      const { id, clientCode, companyName, status, contactInfo, accountManagerId, stats, createdAt, updatedAt } = object;
+      const { id, clientCode, companyName, status, contactInfo, accountManagerId, stats, historicalStats, createdAt, updatedAt } = object;
 
         // 1. Validar campos requeridos
         if (!id) throw new Error("Account Entity: ID es requerido");
@@ -118,6 +138,16 @@ export class AccountEntity {
             ticketsEscalados: stats.ticketsEscalados || 0
         };
 
+        // Validar y parsear historicalStats (opcional)
+        let parsedHistoricalStats: HistoricalStats | undefined;
+        if (historicalStats) {
+            if (typeof historicalStats !== "object" || Array.isArray(historicalStats)) {
+                throw new Error("Account Entity: Historical Stats debe ser un objeto");
+            }
+            // El historicalStats ya está en el formato correcto (se valida en la Cloud Function)
+            parsedHistoricalStats = historicalStats as HistoricalStats;
+        }
+
         // Validar y parsear fechas
         let parsedCreatedAt: Date;
         if (createdAt instanceof Date) {
@@ -147,6 +177,7 @@ export class AccountEntity {
             parsedContactInfo,
             parsedAccountManagerId,
             parsedStats,
+            parsedHistoricalStats,
             parsedCreatedAt,
             parsedUpdatedAt
         );

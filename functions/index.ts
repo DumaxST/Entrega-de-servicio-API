@@ -9,7 +9,7 @@ import cors from "cors";
 
 // Firebase admin init
 import "./src/config/firebaseAdmin";
-import { db } from "./src/config/firebaseAdmin";
+import { db, FieldValue } from "./src/config/firebaseAdmin";
 
 // routes
 import { AppRoutes } from "./src/presentation/routes";
@@ -181,6 +181,138 @@ export const updateAccountStatsOnDeviceChange = functions.firestore
     } catch (error) {
       console.error(`❌ Error updating account ${accountId} stats:`, error);
       // No lanzamos el error para evitar reintentos innecesarios
+      return null;
+    }
+  });
+
+/**
+ * Cloud Function que actualiza las métricas históricas mensuales cuando un ticket se completa.
+ *
+ * Trigger: onWrite en accounts/{accountId}/serviceTickets/{ticketId}
+ *
+ * Características:
+ * - Detecta cuando un ticket cambia a estado "completado"
+ * - Extrae el mes de finalización (formato YYYY_MM)
+ * - Determina el tipo de servicio (instalación, renovación, reubicación, soporte)
+ * - Incrementa atómicamente el contador correspondiente en historicalStats
+ * - Es idempotente: usa eventId para evitar conteos duplicados
+ * - Usa FieldValue.increment() para evitar race conditions
+ */
+export const updateHistoricalStatsOnTicketComplete = functions.firestore
+  .document("accounts/{accountId}/serviceTickets/{ticketId}")
+  .onWrite(async (change: functions.Change<functions.firestore.DocumentSnapshot>, context: functions.EventContext) => {
+    const accountId = context.params.accountId as string;
+    const ticketId = context.params.ticketId as string;
+    const eventId = context.eventId;
+
+    try {
+      // 1. Verificar si es una actualización (no creación ni eliminación)
+      if (!change.before.exists || !change.after.exists) {
+        console.log(`ℹ️ Ticket ${ticketId} fue creado o eliminado, no hay cambio de estado a procesar.`);
+        return null;
+      }
+
+      const beforeData = change.before.data();
+      const afterData = change.after.data();
+
+      if (!beforeData || !afterData) {
+        console.log(`⚠️ No se pudo leer los datos del ticket ${ticketId}`);
+        return null;
+      }
+
+      // 2. Verificar si el status cambió a "completado"
+      const beforeStatus = beforeData.status as string;
+      const afterStatus = afterData.status as string;
+
+      // Solo procesar si el ticket acaba de completarse
+      if (beforeStatus === "completado" || afterStatus !== "completado") {
+        // Si ya estaba completado antes, o no está completado ahora, no hacer nada
+        return null;
+      }
+
+      console.log(`✅ Ticket ${ticketId} cambió de estado "${beforeStatus}" a "completado"`);
+
+      // 3. IDEMPOTENCIA: Verificar si este evento ya fue procesado
+      // Guardamos el eventId en una subcolección de eventos procesados
+      const accountRef = db.collection("accounts").doc(accountId);
+      const eventRef = accountRef.collection("_processedEvents").doc(eventId);
+
+      const eventDoc = await eventRef.get();
+      if (eventDoc.exists) {
+        console.log(`⚠️ Evento ${eventId} ya fue procesado anteriormente. Skipping...`);
+        return null;
+      }
+
+      // Marcar evento como procesado
+      await eventRef.set({
+        ticketId,
+        processedAt: new Date(),
+        eventType: "ticket_completed",
+      });
+
+      // 4. Obtener la fecha de finalización (usar updatedAt del ticket)
+      let completionDate: Date;
+      if (afterData.updatedAt) {
+        if (afterData.updatedAt instanceof Date) {
+          completionDate = afterData.updatedAt;
+        } else if (typeof afterData.updatedAt.toDate === "function") {
+          completionDate = afterData.updatedAt.toDate();
+        } else {
+          completionDate = new Date();
+        }
+      } else {
+        // Fallback a la fecha actual si no hay updatedAt
+        completionDate = new Date();
+      }
+
+      // 5. Generar la clave del mes (formato YYYY_MM)
+      const year = completionDate.getFullYear();
+      const month = String(completionDate.getMonth() + 1).padStart(2, "0");
+      const monthKey = `${year}_${month}`;
+
+      console.log(`📅 Mes de finalización: ${monthKey}`);
+
+      // 6. Determinar el tipo de servicio y el campo a incrementar
+      const ticketType = afterData.type as string;
+      let fieldToIncrement: string;
+
+      switch (ticketType) {
+        case "instalacion":
+          fieldToIncrement = `historicalStats.${monthKey}.instalacionesCompletadas`;
+          break;
+        case "renovacion":
+          fieldToIncrement = `historicalStats.${monthKey}.renovacionesCompletadas`;
+          break;
+        case "reubicacion":
+          fieldToIncrement = `historicalStats.${monthKey}.reubicacionesCompletadas`;
+          break;
+        case "soporte":
+          fieldToIncrement = `historicalStats.${monthKey}.ticketsSoporteCerrados`;
+          break;
+        default:
+          console.warn(`⚠️ Tipo de ticket desconocido: ${ticketType}`);
+          return null;
+      }
+
+      // 7. Actualizar el contador atómicamente usando FieldValue.increment()
+      // Esto evita race conditions y no requiere leer el documento primero
+      const updateData: { [key: string]: any } = {
+        [fieldToIncrement]: FieldValue.increment(1),
+        updatedAt: new Date(),
+      };
+
+      await accountRef.update(updateData);
+
+      console.log(`✅ Métricas históricas actualizadas para cuenta ${accountId}:`, {
+        monthKey,
+        ticketType,
+        fieldIncremented: fieldToIncrement,
+      });
+
+      return null;
+    } catch (error) {
+      console.error(`❌ Error actualizando métricas históricas para cuenta ${accountId}, ticket ${ticketId}:`, error);
+      // No lanzar el error para evitar reintentos innecesarios
       return null;
     }
   });
