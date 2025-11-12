@@ -45,6 +45,7 @@ export class AccountDataSourceImp implements AccountDataSource {
                 reubicacionesPendientes: 0,
                 ticketsEscalados: 0
             },
+            historicalStats: {}, // Inicializar vacío - se llenará con Cloud Functions
             createdAt: FieldValue.serverTimestamp(),
 
         }
