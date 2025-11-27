@@ -5,7 +5,7 @@ import { PlatformRoutes } from "./platforms/routes";
 import { SystemConfigRoutes } from "./systemConfig/routes";
 import { UserRoutes } from "./user/routes";
 import { ServiceTicketRoutes } from "./serviceTickets/routes";
-
+import { StatsRoutes } from "./stats/routes";
 export class AppRoutes{
     static get routes(): Router{
         const router = Router();
@@ -16,6 +16,7 @@ export class AppRoutes{
         router.use("/platform", PlatformRoutes.routes);
         router.use("/system-config", SystemConfigRoutes.routes);
         router.use("/users", UserRoutes.routes);
+        router.use("/stats", StatsRoutes.routes);
 
         return router;
     }
