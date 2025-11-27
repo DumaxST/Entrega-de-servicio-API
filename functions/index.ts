@@ -66,20 +66,34 @@ export const api = functions.https.onRequest(app);
  * Ruta: accounts/{accountId}/devices/{deviceId}
  *
  * Esta función:
- * 1. Lee toda la subcolección devices del accountId afectado
- * 2. Calcula conteos totales para cada estado (reporting, not_reporting, maintenance, inactive)
- * 3. Guarda estos conteos en deviceStatusBreakdown dentro de stats
- * 4. Calcula porcentajes para cada estado y los guarda en deviceStatusPercentages
- * 5. Actualiza totalUnits con el conteo total de dispositivos
- * 6. Consulta la configuración del sistema para determinar el deliveryStatus
- * 7. Guarda deliveryPercentage y deliveryStatus en stats
+ * 1. Detecta si es onCreate, onUpdate o onDelete
+ * 2. Lee toda la subcolección devices del accountId afectado
+ * 3. Calcula conteos totales para cada estado (reporting, not_reporting, maintenance, inactive)
+ * 4. Guarda estos conteos en deviceStatusBreakdown dentro de stats
+ * 5. Calcula porcentajes para cada estado y los guarda en deviceStatusPercentages
+ * 6. Actualiza totalUnits con el conteo total de dispositivos
+ * 7. Consulta la configuración del sistema para determinar el deliveryStatus
+ * 8. Guarda deliveryPercentage y deliveryStatus en stats
+ * 9. Actualiza el contador global totalGlobalUnits en systemStats/main
+ * 10. Usa Write Batch para atomicidad entre actualización de cuenta y global
  */
 export const updateAccountStatsOnDeviceChange = functions.firestore
   .document("accounts/{accountId}/devices/{deviceId}")
   .onWrite(async (change: functions.Change<functions.firestore.DocumentSnapshot>, context: functions.EventContext) => {
     const accountId = context.params.accountId as string;
+    const deviceId = context.params.deviceId as string;
 
     try {
+      // Detectar el tipo de operación
+      const isCreate = !change.before.exists && change.after.exists;
+      const isDelete = change.before.exists && !change.after.exists;
+
+      let operationType = "update";
+      if (isCreate) operationType = "create";
+      if (isDelete) operationType = "delete";
+
+      console.log(`📍 [DeviceChange] Operation: ${operationType} | Device: ${deviceId} | Account: ${accountId}`);
+
       // 1. Leer toda la subcolección devices del accountId
       const devicesSnapshot = await db
         .collection(`accounts/${accountId}/devices`)
@@ -155,10 +169,12 @@ export const updateAccountStatsOnDeviceChange = functions.firestore
         else deliveryStatus = "critico";
       }
 
-      // 8. Actualizar el documento de la cuenta
-      const accountRef = db.collection("accounts").doc(accountId);
+      // 8. Crear Write Batch para atomicidad
+      const batch = db.batch();
 
-      await accountRef.update({
+      // 9. Agregar actualización de stats de la cuenta al batch
+      const accountRef = db.collection("accounts").doc(accountId);
+      batch.update(accountRef, {
         "stats.totalUnits": totalUnits,
         "stats.reportingUnits": statusBreakdown.reporting,
         "stats.nonReportingUnits": statusBreakdown.not_reporting,
@@ -169,12 +185,36 @@ export const updateAccountStatsOnDeviceChange = functions.firestore
         updatedAt: new Date(),
       });
 
-      console.log(`✅ Account ${accountId} stats updated successfully:`, {
+      // 10. Agregar actualización del contador global al batch
+      const globalStatsRef = db.doc("systemStats/main");
+
+      if (isCreate) {
+        // Dispositivo creado: incrementar contador global
+        batch.update(globalStatsRef, {
+          totalGlobalUnits: FieldValue.increment(1),
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+        console.log(`✅ [GlobalStats] Device created | Global counter: +1`);
+      } else if (isDelete) {
+        // Dispositivo eliminado: decrementar contador global
+        batch.update(globalStatsRef, {
+          totalGlobalUnits: FieldValue.increment(-1),
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+        console.log(`✅ [GlobalStats] Device deleted | Global counter: -1`);
+      }
+      // Si es update, no modificar el contador global
+
+      // 11. Ejecutar batch de forma atómica
+      await batch.commit();
+
+      console.log(`✅ [AccountStats] Account ${accountId} stats updated successfully:`, {
         totalUnits,
         statusBreakdown,
         statusPercentages,
         deliveryPercentage,
         deliveryStatus,
+        operationType,
       });
 
       return null;

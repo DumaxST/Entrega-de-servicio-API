@@ -64,10 +64,10 @@ export class SystemConfigDataSourceImp implements SystemConfigDataSource {
         const defaultConfig = {
             serviceThresholds: {
                 excellent: 100,
-                good_range: [95, 99],
-                regular_range: [80, 94],
-                bad_range: [50, 79],
-                critical_range: [0, 49]
+                goodRange: [95, 99],
+                regularRange: [80, 94],
+                badRange: [50, 79],
+                criticalRange: [0, 49]
             },
             notificationTemplate: "<html><body><p>Hola [Cliente], su reporte está disponible.</p></body></html>",
             updatedAt: FieldValue.serverTimestamp(),
